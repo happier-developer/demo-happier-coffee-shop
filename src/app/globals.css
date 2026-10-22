@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Token thiết kế từ DESIGN.md (Happier Coffee) — Tailwind v4 CSS-first qua @theme */
+@theme {
+  --color-cream: #faf6ef;
+  --color-surface: #ffffff;
+  --color-coffee: #3e2a20;
+  --color-caramel: #c08552;
+  --color-cta: #a85b2a;
+  --color-muted: #8a7364;
+  --color-line: #e7dccf;
+  --color-success: #4c8055;
+  --color-warning: #c98a2d;
+  --color-error: #b3402a;
+
+  --font-sans: var(--font-be-vietnam-pro), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-coffee);
+  font-family: var(--font-sans);
+}
