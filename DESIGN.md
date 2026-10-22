@@ -62,4 +62,4 @@
 - Không nên: dùng màu ngoài bảng token; không dùng ảnh tỉ lệ tùy ý làm vỡ lưới; không đặt quá 1 CTA chính trong 1 khối.
 
 ## 9. Changelog thiết kế
-- v1 (2026-10-23): bản đầu theo khung AI-DLC Factory T2 — chờ Duy duyệt tại cổng G2.
+- v1 (2026-10-23): bản đầu theo khung AI-DLC Factory T2 — Duy đã duyệt tại cổng G2 ngày 2026-10-23.
