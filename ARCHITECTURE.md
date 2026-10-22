@@ -1,21 +1,37 @@
 # ARCHITECTURE.md — Happier Coffee (Website bán hàng)
 
-> Trạng thái: **v1 — chờ Duy duyệt tại cổng G3 (AI-DLC Factory spec v1.1, phase P7)**.
+> Trạng thái: **v1.1 — chờ Duy duyệt tại cổng G3 (AI-DLC Factory spec v1.1, phase P7)**.
 > Chưa code foundation (HAP-5) cho tới khi G3 được duyệt.
 > Nguồn ràng buộc: HAP-5 → HAP-20 (Linear), DESIGN.md v1 (đã duyệt G2, 2026-10-23), Vercel project `demo-happier-coffee-shop` + Neon đã tích hợp sẵn.
+> Version dưới đây đã kiểm chứng trực tiếp trên npm registry ngày 2026-10-23 (dist-tag `latest`, trừ các ngoại lệ ghi rõ lý do).
 
-## 1. Stack
+## 1. Stack — đã pin version
 
-| Tầng | Chọn | Ghi chú |
-|---|---|---|
-| Framework | Next.js (App Router) + TypeScript | Đã chốt ở HAP-5. Một app duy nhất cho storefront + admin + API |
-| UI | Tailwind CSS + token màu/font từ DESIGN.md | Token khai báo 1 chỗ (CSS variables / theme), không hard-code màu rải rác |
-| Database | Neon Postgres qua tích hợp Vercel | Đã có `DATABASE_URL` / `POSTGRES_*` cho preview + production |
-| ORM / truy vấn | **Drizzle ORM** + `@neondatabase/serverless` (driver neon-http) + Drizzle Kit cho migration | [Quyết định A1] Nhẹ, SQL-first, type-safe, hợp serverless/Vercel; thay thế nhẹ hơn Prisma (không engine binary, không codegen nặng) |
-| Auth | Neon Auth (Managed Better Auth) — SDK `@neondatabase/auth` bản Next.js | Đã có `NEON_AUTH_BASE_URL`. Xem mục 4 và cảnh báo env ở mục 5 |
-| Icon | Lucide | Theo DESIGN.md |
-| CI | GitHub Actions: lint + build trên mọi PR | Theo acceptance của HAP-5 |
-| Hosting | Vercel: `main` → Production, PR → Preview | Hobby chỉ cho demo/MVP; dùng thương mại phải qua cổng G6 nâng Pro (khách trả) |
+| Tầng | Package / nền tảng | Version pin | Ghi chú |
+|---|---|---|---|
+| Runtime | Node.js (LTS “Krypton”) | **24.22.1** — `.nvmrc` ghi `v24.22.1`, `engines.node = "24.x"`, Vercel Project Settings chọn Node 24.x | Bản vá bảo mật mới nhất của nhánh 24 (phát hành 21/10/2026), hỗ trợ tới 30/04/2028. Không pin Node 26: tới 28/10/2026 mới vào LTS |
+| Package manager | npm | **12.2.1** — khai báo ở field `packageManager` trong `package.json` | CI và local dùng đúng bản này |
+| Framework | `next` (App Router) | **16.4.2** | Đã chốt ở HAP-5. Một app duy nhất cho storefront + admin + API. `eslint-config-next` pin cùng số **16.4.2** |
+| UI library | `react` / `react-dom` | **19.3.1** / **19.3.1** | Đi cặp với Next 16.4 (peer yêu cầu React ^19). `@types/react` / `@types/react-dom` pin **19.3.0** (bản types mới nhất trên registry) |
+| Ngôn ngữ | `typescript` (dev) | **5.9.3** | [Quyết định A5] Xem mục 1.1 — cố ý KHÔNG lấy bản latest 7.0.2 |
+| Types runtime | `@types/node` (dev) | **24.19.2** | Khớp nhánh Node 24 |
+| CSS | `tailwindcss` + `@tailwindcss/postcss` | **4.3.3** / **4.3.3** | Tailwind v4 là CSS-first: token DESIGN.md khai báo bằng `@theme` trong file CSS + `@import "tailwindcss"`, **không có `tailwind.config.js`**; không cần thêm `autoprefixer`/`postcss` rời (plugin PostCSS của Tailwind đã gồm) |
+| Database | Neon Postgres qua tích hợp Vercel | — (Neon quản lý version Postgres theo project, app không pin) | Đã có `DATABASE_URL` / `POSTGRES_*` cho preview + production |
+| ORM / truy vấn | `drizzle-orm` | **0.45.4** | [Quyết định A1] Nhẹ, SQL-first, type-safe, hợp serverless/Vercel; nhẹ hơn Prisma (không engine binary, không codegen nặng) |
+| DB driver | `@neondatabase/serverless` | **1.2.0** | Driver neon-http cho Drizzle, hợp môi trường serverless của Vercel |
+| Migration | `drizzle-kit` (dev) | **0.31.11** | Cặp tương thích với `drizzle-orm` 0.45.x |
+| Auth | `@neondatabase/auth` (Neon Auth — Managed Better Auth, bản Next.js) | **0.7.0-beta** — pin exact tuyệt đối, không dùng `^`/`~`/`@latest` | SDK còn ở beta: API theo tài liệu migration v0.2 (`createNeonAuth()`), peer yêu cầu `next >=16` nên khớp Next 16.4.2. Đã có `NEON_AUTH_BASE_URL`; xem cảnh báo env ở mục 5 và rủi ro beta ở mục 1.1 |
+| Icon | `lucide-react` | **1.61.0** | Theo DESIGN.md |
+| Lint | `eslint` (dev) | **10.13.0** | Peer của `eslint-config-next@16.4.2` yêu cầu `eslint >=9` — thỏa. CI: lint + build trên mọi PR (acceptance HAP-5) |
+| Hosting | Vercel: `main` → Production, PR → Preview | — (nền tảng quản lý) | Hobby chỉ cho demo/MVP; dùng thương mại phải qua cổng G6 nâng Pro (khách trả) |
+
+### 1.1 Quy tắc pin & nâng version — [Quyết định A5]
+
+- `package.json` ghi **version exact** cho mọi dependency (cài bằng `npm install --save-exact`), không để `^` / `~` tự nhảy bản; `package-lock.json` commit vào repo và CI cài bằng `npm ci`.
+- Ngoại lệ có chủ đích — **TypeScript pin 5.9.3, không phải latest 7.0.2**: TS 7 chưa có programmatic compiler API (dự kiến ở 7.1) nên hệ tooling quanh Next/ESLint chưa hỗ trợ đầy đủ, và chính `create-next-app@16.4.2` vẫn scaffold TypeScript dòng 5. Nâng TS chỉ khi 7.1 ổn định API và kiểm chứng lại với Next + ESLint.
+- **Auth SDK đang beta (0.7.0-beta)**: khóa cứng version, khi code HAP-13 phải test sớm đủ luồng đăng ký / đăng nhập / quên mật khẩu trên Preview trước khi làm tiếp tính năng phụ thuộc auth; có lỗi của SDK thì ghi lại, không tự nhảy bản beta khác giữa chừng.
+- Nâng version bất kỳ package nào = **PR riêng**, ghi lý do + đọc changelog của bản đích, CI xanh mới merge; không nâng version tiện tay trong PR tính năng.
+- Chỉ pin version ở tầng app kiểm soát được; version Postgres do Neon quản lý, runtime patch của Vercel bám theo nhánh Node đã pin ở trên.
 
 Không làm ở v1: cổng thanh toán tự động VNPay/MoMo (cần hợp đồng merchant), đa ngôn ngữ, blog, app mobile, bảng giỏ hàng trên DB, UI quản lý phân quyền.
 
@@ -24,6 +40,8 @@ Không làm ở v1: cổng thanh toán tự động VNPay/MoMo (cần hợp đ�
 ```text
 /
 ├─ DESIGN.md / ARCHITECTURE.md / README.md
+├─ .nvmrc                  # v24.22.1 — khớp engines.node và Vercel
+├─ package.json            # version exact + packageManager npm@12.2.1; kèm package-lock.json
 ├─ .env.example            # chỉ tên biến, không secret thật
 ├─ drizzle/                # migration SQL do Drizzle Kit sinh, commit vào repo
 ├─ drizzle.config.ts
@@ -119,6 +137,8 @@ Bảo mật: mọi kiểm tra quyền thực hiện ở server, không tin trạ
 - **A2** Giỏ hàng localStorage phía client, không lưu DB ở v1.
 - **A3** Admin bằng allowlist `ADMIN_EMAILS`, không bảng roles / UI phân quyền ở v1.
 - **A4** Thêm env mới `NEON_AUTH_COOKIE_SECRET` (bắt buộc của Neon Auth SDK hiện tại) + `ADMIN_EMAILS` + `NEXT_PUBLIC_BANK_*`.
+- **A5** Pin version exact toàn bộ stack theo mục 1 (kiểm chứng trên npm registry 2026-10-23), gồm 2 ngoại lệ có lý do: TypeScript giữ 5.9.3 thay vì latest 7.0.2, và `@neondatabase/auth` khóa cứng ở beta 0.7.0-beta.
 
 ## 9. Changelog kiến trúc
 - v1 (2026-10-23): bản đầu theo AI-DLC Factory spec v1.1 phase P7 — chờ Duy duyệt tại cổng G3.
+- v1.1 (2026-10-23): pin version cho toàn bộ stack (mục 1 + quy tắc 1.1) theo yêu cầu của Duy; stack và các quyết định A1–A4 không đổi.
