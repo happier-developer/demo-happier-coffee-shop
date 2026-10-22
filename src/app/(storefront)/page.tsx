@@ -1,8 +1,12 @@
 import Link from "next/link";
+import Container from "@/components/ui/Container";
 
+// Trang chủ — bản stub giữ nguyên từ HAP-5. Trang chủ thật (hero, món nổi
+// bật từ DB...) thuộc HAP-9; HAP-8 chỉ chuyển stub vào route group
+// (storefront) để dùng chung Header/Footer.
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[1200px] flex-col items-center justify-center gap-6 px-4 text-center">
+    <Container className="flex flex-col items-center justify-center gap-6 py-24 text-center">
       <p className="text-sm font-medium tracking-wide text-caramel uppercase">
         Happier Coffee
       </p>
@@ -19,6 +23,6 @@ export default function Home() {
       >
         Kiểm tra trạng thái hệ thống
       </Link>
-    </main>
+    </Container>
   );
 }
