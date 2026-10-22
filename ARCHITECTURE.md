@@ -1,7 +1,7 @@
 # ARCHITECTURE.md — Happier Coffee (Website bán hàng)
 
-> Trạng thái: **v1.1 — chờ Duy duyệt tại cổng G3 (AI-DLC Factory spec v1.1, phase P7)**.
-> Chưa code foundation (HAP-5) cho tới khi G3 được duyệt.
+> Trạng thái: **v1.1 — Duy đã duyệt tại cổng G3 ngày 2026-10-23 (AI-DLC Factory spec v1.1, phase P7)**.
+> Foundation (HAP-5) bắt đầu code theo đúng bản kiến trúc này.
 > Nguồn ràng buộc: HAP-5 → HAP-20 (Linear), DESIGN.md v1 (đã duyệt G2, 2026-10-23), Vercel project `demo-happier-coffee-shop` + Neon đã tích hợp sẵn.
 > Version dưới đây đã kiểm chứng trực tiếp trên npm registry ngày 2026-10-23 (dist-tag `latest`, trừ các ngoại lệ ghi rõ lý do).
 
@@ -142,3 +142,4 @@ Bảo mật: mọi kiểm tra quyền thực hiện ở server, không tin trạ
 ## 9. Changelog kiến trúc
 - v1 (2026-10-23): bản đầu theo AI-DLC Factory spec v1.1 phase P7 — chờ Duy duyệt tại cổng G3.
 - v1.1 (2026-10-23): pin version cho toàn bộ stack (mục 1 + quy tắc 1.1) theo yêu cầu của Duy; stack và các quyết định A1–A4 không đổi.
+- v1.1 (2026-10-23): **Duy đã duyệt tại cổng G3** — toàn bộ kiến trúc gồm các quyết định A1–A5 chính thức có hiệu lực; bắt đầu code HAP-5 foundation.
