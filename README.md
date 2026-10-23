@@ -121,7 +121,48 @@ ARCHITECTURE.md mục 1.1; không tự nâng bản).
   (sinh bằng `openssl rand -base64 32`). Chỉ đặt trên Vercel / `.env.local`,
   **không** commit, không để trong chat/repo.
 
-## Phân quyền Admin (kế hoạch — HAP-15)
+## Quản trị viên (admin) — HAP-15
 
-Khu `/admin` sẽ dùng allowlist `ADMIN_EMAILS` (email cách nhau bằng dấu
-phẩy) kiểm tra ở server — xem ARCHITECTURE.md mục 4.
+Khu quản trị `/admin` (tổng quan; quản lý sản phẩm ở HAP-16, đơn hàng ở
+HAP-17) chỉ mở cho tài khoản **đã đăng nhập** mà email nằm trong biến
+env `ADMIN_EMAILS`. Không có bảng roles và không có giao diện phân
+quyền — allowlist env là nguồn sự thật duy nhất (ARCHITECTURE.md mục 4,
+quyết định A3).
+
+### Hành vi chặn ở server
+
+| Trường hợp | Kết quả |
+|---|---|
+| Chưa đăng nhập | Redirect sang `/auth/dang-nhap?next=/admin`, đăng nhập xong quay lại khu admin |
+| Đã đăng nhập, email **không** có trong `ADMIN_EMAILS` | **HTTP 403** — trang "Không có quyền truy cập" (nêu rõ email đang đăng nhập) |
+| Đã đăng nhập, email có trong `ADMIN_EMAILS` | Vào được khu `/admin` |
+
+Việc kiểm tra diễn ra ở layout server của khu `/admin`
+(`requireAdmin()` trong `src/lib/auth/admin.ts`) và được gọi lại trong
+từng Server Action admin — header/client không quyết định quyền.
+
+### Chỉ định tài khoản admin đầu tiên
+
+1. **Đăng ký tài khoản** bằng email của bạn ngay trên website
+   (trang `/auth/dang-ky`) — đây sẽ là tài khoản admin.
+2. Vào **Vercel** → project `demo-happier-coffee-shop` → Settings →
+   Environment Variables, thêm biến:
+   - Name: `ADMIN_EMAILS`
+   - Value: email vừa đăng ký ở bước 1 (ví dụ `chuquan@happier.coffee`)
+   - Environments: **Production** và **Preview** (chọn cả hai).
+3. **Redeploy** để env có hiệu lực: Deployments → deployment mới nhất →
+   ⋯ → Redeploy. (Đổi giá trị `ADMIN_EMAILS` về sau cũng phải redeploy
+   mới áp dụng.)
+4. Đăng nhập lại trên website bằng tài khoản đó rồi mở `/admin` — vào
+   được là xong.
+
+### Lưu ý
+
+- **Nhiều admin:** liệt kê các email cách nhau bằng dấu phẩy, ví dụ
+  `ADMIN_EMAILS=a@happier.coffee, b@happier.coffee`. So khớp không
+  phân biệt hoa/thường, khoảng trắng thừa được bỏ qua.
+- **`ADMIN_EMAILS` trống = không có admin nào:** khu `/admin` khoá
+  hoàn toàn với mọi tài khoản (kể cả đã đăng nhập) — đây là mặc định an
+  toàn, không phải lỗi.
+- Muốn thu hồi quyền của ai: xoá email của họ khỏi `ADMIN_EMAILS` rồi
+  redeploy.
