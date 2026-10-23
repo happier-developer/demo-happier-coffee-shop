@@ -54,14 +54,14 @@ export default function AddToCartButton({
       onClick={handleClick}
       disabled={disabled || added}
       aria-live="polite"
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-cta px-3.5 py-2 text-sm font-medium whitespace-nowrap text-white transition hover:bg-coffee focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none ${
+      className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-cta px-3.5 py-2 text-sm font-medium whitespace-nowrap text-white transition duration-state ease-standard active:scale-[0.97] hover:bg-coffee focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none ${
         // Chỉ mờ khi hết hàng (disabled từ props); trạng thái "Đã thêm"
         // giữ nguyên màu để khách thấy xác nhận rõ ràng.
         disabled && !added ? "disabled:opacity-50" : "disabled:opacity-100"
       }`}
     >
       {added ? (
-        <Check className="h-4 w-4" aria-hidden />
+        <Check className="h-4 w-4 animate-pop" aria-hidden />
       ) : (
         <ShoppingCart className="h-4 w-4" aria-hidden />
       )}
