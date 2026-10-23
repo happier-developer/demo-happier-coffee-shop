@@ -38,6 +38,10 @@ export default function AddToCartButton({
   );
 
   const handleClick = () => {
+    // HAP-22 (Bug 1): trong trạng thái "Đã thêm" nút phải khóa — bấm lại
+    // không được cộng thêm vào giỏ. Chặn ở handler (phòng thủ) lẫn
+    // thuộc tính disabled bên dưới.
+    if (disabled || added) return;
     addItem({ productId, slug, name, priceVnd, imageUrl }, quantity);
     setAdded(true);
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -48,9 +52,13 @@ export default function AddToCartButton({
     <button
       type="button"
       onClick={handleClick}
-      disabled={disabled}
+      disabled={disabled || added}
       aria-live="polite"
-      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-cta px-3.5 py-2 text-sm font-medium whitespace-nowrap text-white transition hover:bg-coffee focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50"
+      className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-cta px-3.5 py-2 text-sm font-medium whitespace-nowrap text-white transition hover:bg-coffee focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none ${
+        // Chỉ mờ khi hết hàng (disabled từ props); trạng thái "Đã thêm"
+        // giữ nguyên màu để khách thấy xác nhận rõ ràng.
+        disabled && !added ? "disabled:opacity-50" : "disabled:opacity-100"
+      }`}
     >
       {added ? (
         <Check className="h-4 w-4" aria-hidden />
