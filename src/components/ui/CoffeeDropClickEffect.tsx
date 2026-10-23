@@ -69,18 +69,19 @@ export default function CoffeeDropClickEffect() {
           style={{ left: drop.x, top: drop.y }}
         >
           {/* Giọt loang: radial-gradient coffee → caramel, alpha ≤ 0.35
-              theo DESIGN.md để không trông như vết lem. h-24 w-24 = 96px
-              kích thước tối đa; -left-12/-top-12 để tâm giọt trùng điểm
-              nhấn mà keyframes chỉ cần animate scale. */}
+              theo DESIGN.md để không trông như vết lem. h-14 w-14 = 56px
+              kích thước tối đa (Duy yêu cầu thu nhỏ từ 96px, HAP-24);
+              -left-7/-top-7 để tâm giọt trùng điểm nhấn mà keyframes
+              chỉ cần animate scale. */}
           <span
-            className="animate-coffee-drop absolute -top-12 -left-12 block h-24 w-24 rounded-full"
+            className="animate-coffee-drop absolute -top-7 -left-7 block h-14 w-14 rounded-full"
             style={{
               background:
                 "radial-gradient(circle, rgba(62, 42, 32, 0.35) 0%, rgba(192, 133, 82, 0.28) 45%, rgba(192, 133, 82, 0) 70%)",
             }}
           />
           {/* Vòng gợn mờ lan ra ngoài giọt. */}
-          <span className="animate-coffee-ring absolute -top-12 -left-12 block h-24 w-24 rounded-full border-2 border-caramel" />
+          <span className="animate-coffee-ring absolute -top-7 -left-7 block h-14 w-14 rounded-full border-2 border-caramel" />
         </span>
       ))}
     </div>
