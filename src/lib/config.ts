@@ -45,3 +45,69 @@ export const mainNav = [
   { label: "Giới thiệu", href: "/gioi-thieu" },
   { label: "Liên hệ", href: "/lien-he" },
 ] as const;
+
+// --- VietQR (HAP-12) -------------------------------------------------------
+// Thông tin nhận tiền của quán đọc từ env NEXT_PUBLIC_BANK_* (công khai,
+// được phép ở client — ARCHITECTURE.md mục 5). Env hiện CHƯA đặt trên
+// Vercel nên dùng bộ PLACEHOLDER rõ ràng dưới đây để demo luồng checkout;
+// khi quán cung cấp số tài khoản thật chỉ cần đặt 3 biến env, không sửa code.
+
+const BANK_NAMES_BY_BIN: Record<string, string> = {
+  "970436": "Vietcombank",
+  "970415": "VietinBank",
+  "970418": "BIDV",
+  "970416": "ACB",
+  "970422": "MB Bank",
+  "970407": "Techcombank",
+  "970432": "VPBank",
+  "970423": "TPBank",
+};
+
+const PLACEHOLDER_BANK = {
+  bin: "970436",
+  account: "0123456789",
+  accountName: "HAPPIER COFFEE (DEMO)",
+} as const;
+
+export interface BankConfig {
+  bin: string;
+  account: string;
+  accountName: string;
+  bankName: string;
+  /** true khi đang dùng thông tin mẫu (chưa có env thật). */
+  isPlaceholder: boolean;
+}
+
+function resolveBankConfig(): BankConfig {
+  const bin = process.env.NEXT_PUBLIC_BANK_BIN?.trim();
+  const account = process.env.NEXT_PUBLIC_BANK_ACCOUNT?.trim();
+  const accountName = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME?.trim();
+
+  // Chỉ dùng env khi đủ cả 3 giá trị; thiếu một phần thì dùng trọn bộ
+  // placeholder để tránh QR nửa thật nửa mẫu gây nhầm lẫn.
+  const resolved =
+    bin && account && accountName
+      ? { bin, account, accountName, isPlaceholder: false }
+      : { ...PLACEHOLDER_BANK, isPlaceholder: true };
+
+  return {
+    ...resolved,
+    bankName:
+      BANK_NAMES_BY_BIN[resolved.bin] ?? `Ngân hàng (mã ${resolved.bin})`,
+  };
+}
+
+export const bankConfig: BankConfig = resolveBankConfig();
+
+/**
+ * URL ảnh VietQR động (img.vietqr.io) kèm số tiền và nội dung chuyển khoản
+ * = mã đơn, để admin đối soát khi tiền về (xác nhận tay ở HAP-17).
+ */
+export function buildVietQrImageUrl(code: string, amountVnd: number): string {
+  const params = new URLSearchParams({
+    amount: String(amountVnd),
+    addInfo: code,
+    accountName: bankConfig.accountName,
+  });
+  return `https://img.vietqr.io/image/${bankConfig.bin}-${bankConfig.account}-compact2.png?${params.toString()}`;
+}
