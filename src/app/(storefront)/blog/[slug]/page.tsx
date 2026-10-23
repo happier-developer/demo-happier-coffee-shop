@@ -45,6 +45,10 @@ export async function generateMetadata({
   if (!post) {
     return { title: "Không tìm thấy bài viết" };
   }
+  // publishedAt qua unstable_cache có thể là chuỗi ISO (sau khi cache
+  // serialize) chứ không còn là Date — chuẩn hoá trước khi toISOString,
+  // nếu không generateMetadata sẽ ném lỗi và cả trang trả 500.
+  const publishedDate = post.publishedAt ? new Date(post.publishedAt) : null;
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
@@ -54,7 +58,10 @@ export async function generateMetadata({
       type: "article",
       url: `${siteUrl}/blog/${post.slug}`,
       images: post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
-      publishedTime: post.publishedAt?.toISOString(),
+      publishedTime:
+        publishedDate && !Number.isNaN(publishedDate.getTime())
+          ? publishedDate.toISOString()
+          : undefined,
       authors: [post.author],
     },
   };
