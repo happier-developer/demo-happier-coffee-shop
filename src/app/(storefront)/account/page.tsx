@@ -1,15 +1,26 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ChevronRight, ShoppingBag } from "lucide-react";
 import SignOutButton from "@/components/auth/SignOutButton";
+import {
+  OrderStatusBadge,
+  PaymentStatusBadge,
+} from "@/components/orders/OrderStatusBadge";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import { getCurrentUser } from "@/lib/auth/server";
+import type { Order } from "@/lib/db/schema";
+import { formatDateTimeVi, formatVnd } from "@/lib/format";
+import { listOrdersForUser } from "@/lib/orders/history";
 
-// Trang tài khoản (HAP-13) — guard ở SERVER: chưa có phiên thì redirect
-// về /auth/dang-nhap?next=/account để đăng nhập xong quay lại đúng trang.
-// Trang nằm trong route group (storefront) để dùng chung Header/Footer;
-// URL vẫn là /account. Nội dung v1 tối thiểu: thông tin tài khoản + nút
-// Đăng xuất. Lịch sử đơn hàng là HAP-14, chưa làm ở đây.
+// Trang tài khoản (HAP-13 + HAP-14) — guard ở SERVER: chưa có phiên
+// thì redirect về /auth/dang-nhap?next=/account để đăng nhập xong quay
+// lại đúng trang. Trang nằm trong route group (storefront) để dùng
+// chung Header/Footer; URL vẫn là /account. Nội dung: thông tin tài
+// khoản + nút Đăng xuất (HAP-13) và danh sách đơn hàng của chính user
+// (HAP-14, truy vấn scope theo user_id của phiên — xem
+// src/lib/orders/history.ts).
 //
 // Trang đọc cookie phiên nên bắt buộc dynamic.
 export const dynamic = "force-dynamic";
@@ -33,6 +44,17 @@ export default async function AccountPage() {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/auth/dang-nhap?next=/account");
+  }
+
+  // Lịch sử đơn: chỉ đơn của đúng user này (scope ở tầng truy vấn).
+  // Lỗi DB không được làm sập cả trang tài khoản — hiện thông báo riêng.
+  let myOrders: Order[] = [];
+  let ordersLoadFailed = false;
+  try {
+    myOrders = await listOrdersForUser(user.id);
+  } catch (error) {
+    console.error("listOrdersForUser failed:", error);
+    ordersLoadFailed = true;
   }
 
   const memberSince = formatMemberSince(user.createdAt);
@@ -72,16 +94,76 @@ export default async function AccountPage() {
           </dl>
         </div>
 
-        <p className="mt-4 text-sm text-muted">
-          Lịch sử đơn hàng sẽ hiển thị tại trang này trong bản cập nhật tiếp
-          theo. Các đơn bạn đặt khi đã đăng nhập đều được gắn với tài khoản
-          này.
-        </p>
-
         <div className="mt-6 flex flex-wrap gap-3">
           <Button href="/menu">Xem menu</Button>
           <SignOutButton />
         </div>
+
+        <section className="mt-10" aria-labelledby="order-history-title">
+          <h2
+            id="order-history-title"
+            className="mb-4 text-xl font-bold text-coffee"
+          >
+            Đơn hàng của tôi
+          </h2>
+
+          {ordersLoadFailed ? (
+            <div className="rounded-2xl border border-line bg-surface p-6 text-center">
+              <p className="text-muted">
+                Chưa tải được danh sách đơn hàng lúc này. Bạn vui lòng quay
+                lại sau ít phút nhé.
+              </p>
+            </div>
+          ) : myOrders.length === 0 ? (
+            <div className="rounded-2xl border border-line bg-surface p-8 text-center">
+              <ShoppingBag
+                className="mx-auto h-10 w-10 text-muted"
+                aria-hidden
+              />
+              <p className="mt-3 font-medium text-coffee">
+                Bạn chưa có đơn hàng nào
+              </p>
+              <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
+                Các đơn bạn đặt khi đã đăng nhập sẽ xuất hiện tại đây để
+                theo dõi trạng thái giao hàng.
+              </p>
+              <div className="mt-5">
+                <Button href="/menu">Xem menu</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface">
+              <ul className="divide-y divide-line">
+                {myOrders.map((order) => (
+                  <li key={order.id}>
+                    <Link
+                      href={`/account/don-hang/${order.code}`}
+                      className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-cream"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-bold break-all text-coffee">
+                          {order.code}
+                        </span>
+                        <span className="block text-sm text-muted">
+                          {formatDateTimeVi(order.createdAt)}
+                        </span>
+                      </span>
+                      <PaymentStatusBadge status={order.paymentStatus} />
+                      <OrderStatusBadge status={order.status} />
+                      <span className="font-bold text-caramel">
+                        {formatVnd(order.totalVnd)}
+                      </span>
+                      <ChevronRight
+                        className="h-5 w-5 shrink-0 text-muted"
+                        aria-hidden
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
       </div>
     </Container>
   );
