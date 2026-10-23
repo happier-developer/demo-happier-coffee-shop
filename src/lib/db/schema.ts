@@ -135,6 +135,30 @@ export const orderItems = pgTable("order_items", {
   lineTotalVnd: integer("line_total_vnd").notNull(),
 });
 
+// Bài viết Blog (HAP-28): nội dung `content` là HTML do editor Tiptap
+// trong admin sinh ra (nguồn tin cậy nội bộ — chỉ admin mới tạo/sửa).
+// Bài nháp (is_published = false) không xuất hiện ở storefront;
+// published_at ghi tại thời điểm xuất bản lần đầu.
+export const blogPosts = pgTable(
+  "blog_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull().unique(),
+    title: text("title").notNull(),
+    excerpt: text("excerpt"),
+    content: text("content").notNull(),
+    coverImageUrl: text("cover_image_url"),
+    author: text("author").notNull().default("Happier Coffee"),
+    isPublished: boolean("is_published").notNull().default(false),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    index("blog_posts_slug_idx").on(table.slug),
+    index("blog_posts_is_published_idx").on(table.isPublished),
+  ],
+);
+
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type Product = typeof products.$inferSelect;
@@ -143,3 +167,5 @@ export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type NewOrderItem = typeof orderItems.$inferInsert;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type NewBlogPost = typeof blogPosts.$inferInsert;

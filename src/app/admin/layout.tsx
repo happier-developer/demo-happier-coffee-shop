@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ClipboardList, Coffee, LayoutDashboard, Package } from "lucide-react";
+import { ClipboardList, Coffee, FileText, LayoutDashboard, Package } from "lucide-react";
 import SignOutButton from "@/components/auth/SignOutButton";
 import { requireAdmin } from "@/lib/auth/admin";
 
@@ -34,7 +34,8 @@ export const metadata: Metadata = {
 
 // Mục điều hướng sidebar. `href: null` = mục chưa có trang (khung chờ
 // issue sau), hiển thị mờ kèm nhãn "Sắp có" thay vì link chết 404.
-// Cả 3 mục đã có trang thật (Sản phẩm — HAP-16, Đơn hàng — HAP-17).
+// Các mục đã có trang thật (Sản phẩm — HAP-16, Đơn hàng — HAP-17,
+// Bài viết — HAP-28).
 const NAV_ITEMS: Array<{
   label: string;
   href: string | null;
@@ -44,6 +45,7 @@ const NAV_ITEMS: Array<{
   { label: "Tổng quan", href: "/admin", note: null, icon: LayoutDashboard },
   { label: "Sản phẩm", href: "/admin/san-pham", note: null, icon: Package },
   { label: "Đơn hàng", href: "/admin/don-hang", note: null, icon: ClipboardList },
+  { label: "Bài viết", href: "/admin/bai-viet", note: null, icon: FileText },
 ];
 
 export default async function AdminLayout({

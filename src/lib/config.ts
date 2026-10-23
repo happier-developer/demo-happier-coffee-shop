@@ -135,6 +135,7 @@ export const mapDirectionsUrl = `https://www.google.com/maps/search/?api=1&query
 export const mainNav = [
   { label: "Trang chủ", href: "/" },
   { label: "Menu", href: "/menu" },
+  { label: "Blog", href: "/blog" },
   { label: "Giới thiệu", href: "/gioi-thieu" },
   { label: "Liên hệ", href: "/lien-he" },
 ] as const;

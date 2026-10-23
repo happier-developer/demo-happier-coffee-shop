@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
-import { categories, orders, products } from "./schema.ts";
+import { blogPosts, categories, orders, products } from "./schema.ts";
 
 // Seed dữ liệu mẫu cho Happier Coffee (HAP-7, bổ sung HAP-27): 3 categories,
 // 39 products (14 món gốc + 25 món bổ sung cho menu demo phong phú hơn).
@@ -531,6 +531,151 @@ const PRODUCT_SEED: ReadonlyArray<{
   },
 ];
 
+// --- Bài viết Blog mẫu (HAP-28): nội dung HTML theo đúng đầu ra của
+// editor Tiptap trong admin (<p>, <h2>, <ul>, <strong>, <em>,
+// <blockquote>, <a>) để trang chi tiết render đồng nhất với bài do
+// admin tự soạn. Idempotent theo slug như sản phẩm.
+const POST_SEED: ReadonlyArray<{
+  slug: string;
+  title: string;
+  excerpt: string;
+  coverImageUrl: string;
+  publishedAt: string;
+  content: string;
+}> = [
+  {
+    slug: "pha-ca-phe-phin-chuan-vi-tai-nha",
+    title: "Pha cà phê phin chuẩn vị tại nhà",
+    excerpt:
+      "Tỉ lệ vàng 1:4, nước 93-96°C và ba lỗi nhỏ khiến ly phin đắng gắt — hướng dẫn từng bước để có ly cà phê phin nhỏ giọt chuẩn vị quán ngay tại bếp nhà.",
+    coverImageUrl:
+      "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=800&auto=format&fit=crop",
+    publishedAt: "2026-10-20T08:00:00+07:00",
+    content: `<p>Cà phê phin là cách pha chậm rãi và rất "Việt Nam": nước nóng đi qua lớp bột cà phê bằng trọng lực, nhỏ từng giọt xuống ly. Nghe đơn giản, nhưng chỉ cần lệch một chút về tỉ lệ hay nhiệt độ là ly cà phê dễ đắng gắt hoặc nhạt nhẽo. Bài này là quy trình mà barista của Happier Coffee dùng mỗi ngày, gọn lại để bạn làm được ngay tại nhà.</p>
+<h2>Chuẩn bị</h2>
+<ul>
+<li><strong>Cà phê:</strong> 25g bột xay vừa (cỡ hạt cát thô). Hạt robusta rang vừa cho vị đậm kiểu truyền thống; thích nhẹ nhàng hơn thì trộn 70% robusta + 30% arabica.</li>
+<li><strong>Nước:</strong> 100ml nước nóng 93-96°C — sôi xong để nguội khoảng 1 phút là vừa.</li>
+<li><strong>Dụng cụ:</strong> phin nhôm hoặc inox, ly thủy tinh dày, và một chút kiên nhẫn.</li>
+</ul>
+<h2>Các bước pha</h2>
+<ul>
+<li><strong>Tráng phin</strong> bằng nước nóng để làm ấm và sạch phin.</li>
+<li>Cho 25g cà phê vào phin, lắc nhẹ cho mặt bột phẳng, đặt nắp gài và <em>ấn vừa tay</em> — chặt quá nước không thấm, lỏng quá cà phê chảy ào và chua.</li>
+<li><strong>Ủ (bloom):</strong> rót 20ml nước nóng, chờ 30 giây cho bột nở đều.</li>
+<li>Rót tiếp 80ml nước còn lại, đậy nắp, chờ nhỏ giọt. Tốc độ chuẩn là khoảng <strong>1 giọt mỗi giây</strong>, tổng thời gian 5-7 phút.</li>
+<li>Khuấy đều phần cốt cà phê, thêm sữa đặc hoặc đường theo khẩu vị, cho đá vào và thưởng thức.</li>
+</ul>
+<h2>Ba lỗi thường gặp</h2>
+<ul>
+<li><strong>Nước quá sôi (100°C):</strong> chiết xuất quá tay, ly cà phê đắng gắt và khét. Hãy để nước nghỉ một phút sau khi sôi.</li>
+<li><strong>Xay quá mịn:</strong> bột bít lỗ phin, nước chảy rất lâu và vị chát tăng mạnh.</li>
+<li><strong>Ấn nắp gài quá chặt:</strong> tưởng đậm hơn nhưng thực ra nước chỉ thấm một phần bột, ly cà phê vừa yếu vừa không đều vị.</li>
+</ul>
+<blockquote>Pha phin ngon là pha chậm mà chắc: đúng tỉ lệ, đúng nhiệt độ, và đừng vội.</blockquote>
+<p>Nếu bạn muốn nếm "bản chuẩn" trước khi tự pha, ghé quán thử ly <strong>cà phê sữa đá</strong> — món chủ lực được pha đúng quy trình này mỗi sáng.</p>`,
+  },
+  {
+    slug: "cold-brew-khac-gi-ca-phe-phin",
+    title: "Cold brew khác gì cà phê phin?",
+    excerpt:
+      "Một bên ủ lạnh 18 giờ, một bên nhỏ giọt bằng nước nóng — cold brew và cà phê phin khác nhau từ cách chiết xuất đến hậu vị. Bài này giúp bạn chọn đúng gu.",
+    coverImageUrl:
+      "https://images.unsplash.com/photo-1507133750040-4a8f57021571?q=80&w=800&auto=format&fit=crop",
+    publishedAt: "2026-10-14T08:00:00+07:00",
+    content: `<p>Cùng là cà phê đen mát lạnh, nhưng cold brew và cà phê phin là hai trải nghiệm gần như trái ngược. Hiểu rõ khác biệt giúp bạn gọi đúng món theo tâm trạng — và theo cái bụng của mình nữa.</p>
+<h2>Khác nhau từ cách chiết xuất</h2>
+<p><strong>Cà phê phin</strong> dùng nước nóng 93-96°C đi qua bột cà phê trong 5-7 phút. Nhiệt độ cao kéo ra nhiều hợp chất hương lẫn vị chua và đắng — đó là lý do phin có vị "đậm, gắt, rất cà phê".</p>
+<p><strong>Cold brew</strong> ngâm bột cà phê trong nước lạnh 12-18 giờ. Không có nhiệt, các hợp chất chua và đắng ít tan hơn nhiều, trong khi vị ngọt tự nhiên và hương sô-cô-la, hạt dẻ lại nổi lên. Kết quả là một ly cà phê êm, mượt, ít chua gắt — nhiều người thấy "dễ uống" hơn hẳn.</p>
+<h2>So sánh nhanh</h2>
+<ul>
+<li><strong>Vị:</strong> phin đậm, đắng rõ, hậu khói nhẹ; cold brew thanh, ngọt tự nhiên, hậu sạch.</li>
+<li><strong>Độ chua:</strong> phin chua nhẹ đặc trưng; cold brew rất ít chua — hợp người dạ dày nhạy cảm.</li>
+<li><strong>Caffeine:</strong> cold brew thường <em>cao hơn</em> vì ngâm lâu và tỉ lệ cà phê lớn, dù uống vào thấy "nhẹ" hơn. Đừng để vị êm đánh lừa!</li>
+<li><strong>Cách uống:</strong> phin hợp với sữa đặc kiểu truyền thống; cold brew ngon nhất khi uống nguyên chất với đá, hoặc thêm lát cam, chút tonic.</li>
+</ul>
+<h2>Vậy gu nào hợp với bạn?</h2>
+<p>Nếu bạn thích khởi đầu ngày mới bằng một cú "tỉnh táo dứt khoát" và yêu vị cà phê truyền thống, hãy chọn phin. Nếu bạn muốn một ly cà phê nhâm nhi cả buổi, ít chua, hậu ngọt và không cần sữa đường, cold brew sinh ra cho bạn.</p>
+<blockquote>Không có cách pha nào "ngon hơn" tuyệt đối — chỉ có cách pha hợp với khẩu vị và khoảnh khắc của bạn hơn.</blockquote>
+<p>Ở Happier Coffee, cả hai đều có mặt trong menu. Lần tới ghé quán, thử gọi mỗi loại một ly nhỏ và tự mình cảm nhận sự khác biệt nhé.</p>`,
+  },
+  {
+    slug: "robusta-va-arabica-gu-nao-hop-voi-ban",
+    title: "Robusta và Arabica: gu nào hợp với bạn?",
+    excerpt:
+      "Robusta đậm, nhiều caffeine, là linh hồn của cà phê Việt; Arabica thơm, chua thanh, được giới specialty săn đón. Hiểu hai giống hạt này để chọn ly cà phê đúng gu.",
+    coverImageUrl:
+      "https://images.unsplash.com/photo-1445116572660-236099ec97a0?q=80&w=800&auto=format&fit=crop",
+    publishedAt: "2026-10-08T08:00:00+07:00",
+    content: `<p>Hơn 90% cà phê trên thế giới thuộc về hai giống: <strong>Robusta</strong> và <strong>Arabica</strong>. Việt Nam là quê hương của robusta hảo hạng, còn arabica gắn với những vùng cao như Cầu Đất, Sơn La. Vậy hai giống này khác nhau thế nào trong ly?</p>
+<h2>Robusta — đậm và thẳng thắn</h2>
+<ul>
+<li>Caffeine cao gần gấp đôi arabica (khoảng 2,2-2,7%) → tỉnh táo mạnh.</li>
+<li>Vị đậm, đắng rõ, hậu sô-cô-la đen và khói nhẹ; lớp crema dày khi pha espresso.</li>
+<li>Hạt cứng cáp, kháng bệnh tốt, trồng được ở độ cao thấp — giá dễ chịu hơn.</li>
+<li>Là lựa chọn số một cho cà phê phin, cà phê sữa đá và bạc xỉu.</li>
+</ul>
+<h2>Arabica — thơm và tinh tế</h2>
+<ul>
+<li>Caffeine thấp hơn (khoảng 1,2-1,5%), nhiều đường và dầu thơm hơn.</li>
+<li>Vị chua thanh kiểu trái cây, hương hoa, mật ong, hạt dẻ tùy vùng trồng.</li>
+<li>Khó trồng, kén độ cao và khí hậu (thường trên 1.000m) nên giá cao hơn.</li>
+<li>Hợp với pour over, espresso uống nguyên chất và các món latte, cappuccino cần vị êm.</li>
+</ul>
+<h2>Không phải cứ arabica là "xịn" hơn</h2>
+<p>Một ly phin sữa đá làm từ arabica 100% thường bị chê là "nhạt, chua, không ra cà phê Việt" — trong khi robusta chất lượng cao, rang đúng, lại cho trải nghiệm trọn vẹn. Ngược lại, pha pour over bằng robusta rẻ tiền thì khó mà thơm tinh tế được.</p>
+<blockquote>Giống hạt chỉ là điểm bắt đầu. Chất lượng thu hái, cách rang và cách pha mới quyết định ly cà phê cuối cùng.</blockquote>
+<p>Mẹo nhỏ khi chọn: thích <strong>đậm — đắng — tỉnh</strong> thì robusta; thích <strong>thơm — thanh — khám phá</strong> thì arabica; còn phân vân, một tỉ lệ trộn 70/30 như quán đang dùng cho espresso là điểm cân bằng rất dễ chịu.</p>`,
+  },
+  {
+    slug: "matcha-tu-tra-dao-den-latte",
+    title: "Matcha: từ trà đạo Nhật Bản đến ly latte mỗi ngày",
+    excerpt:
+      "Từ nghi lễ trà đạo hàng trăm năm tuổi đến ly matcha latte xanh mướt trong quán cà phê Sài Gòn — hành trình của bột trà xanh và cách whisk đúng để matcha không bị vón, không đắng gắt.",
+    coverImageUrl:
+      "https://images.unsplash.com/photo-1522992319-0365e5f11656?q=80&w=800&auto=format&fit=crop",
+    publishedAt: "2026-09-30T08:00:00+07:00",
+    content: `<p>Matcha không phải "trà xanh xay nhuyễn" theo nghĩa đơn giản. Đó là lá trà <em>tencha</em> được che nắng nhiều tuần trước thu hoạch, hấp, sấy, bỏ gân và nghiền bằng cối đá thành bột mịn. Người Nhật đã đưa matcha vào trà đạo từ thế kỷ 12 — một nghi lễ chậm rãi, tĩnh lặng, nơi mỗi thao tác đều có ý nghĩa.</p>
+<h2>Vì sao matcha tốt cho sức khỏe?</h2>
+<ul>
+<li>Uống matcha là uống <strong>cả lá trà</strong>, nên chất chống oxy hóa (EGCG) cao hơn trà xanh pha lá nhiều lần.</li>
+<li>Caffeine trong matcha đi cùng <strong>L-theanine</strong> — axit amin giúp tỉnh táo mà vẫn thư thái, ít "say cà phê" và ít tụt năng lượng đột ngột.</li>
+<li>Chlorophyll từ quá trình che nắng tạo màu xanh đậm và vị umami đặc trưng.</li>
+</ul>
+<h2>Whisk đúng cách: chìa khóa của ly matcha ngon</h2>
+<p>Khác biệt lớn nhất giữa matcha quán ngon và matcha tự pha bị vón nằm ở bước whisk. Bột matcha được rây mịn, thêm nước nóng khoảng <strong>80°C</strong> (nước sôi già làm matcha đắng và mất hương), rồi dùng chổi chasen đánh theo hình chữ M thật nhanh trong 15-20 giây đến khi nổi lớp bọt mịn như kem.</p>
+<blockquote>Lớp bọt mịn trên mặt không chỉ để đẹp — đó là dấu hiệu matcha đã tan đều và vị sẽ êm, béo, không lợn cợn.</blockquote>
+<h2>Matcha latte: cuộc gặp Đông — Tây</h2>
+<p>Khi matcha gặp sữa tươi, vị chát nhẹ và umami được làm dịu, thành một ly đồ uống béo thơm mà vẫn thanh. Ở Happier Coffee, ngoài matcha latte truyền thống, quán còn có <strong>matcha cốt dừa</strong> — biến tấu rất Việt Nam mà bạn nên thử ít nhất một lần.</p>
+<p>Lần tới khi cần tỉnh táo nhưng không muốn thêm một ly cà phê nữa, hãy để matcha làm nhiệm vụ đó — nhẹ nhàng mà hiệu quả.</p>`,
+  },
+  {
+    slug: "ghep-banh-voi-ca-phe-hop-vi",
+    title: "Ghép bánh với cà phê sao cho hợp vị?",
+    excerpt:
+      "Tiramisu đi với espresso, croissant hợp latte, flan cà phê sinh ra để ăn cùng bạc xỉu — vài nguyên tắc ghép đôi đơn giản giúp buổi cà phê của bạn tròn vị hơn hẳn.",
+    coverImageUrl:
+      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800&auto=format&fit=crop",
+    publishedAt: "2026-09-22T08:00:00+07:00",
+    content: `<p>Một ly cà phê ngon đã là nửa niềm vui; nửa còn lại nằm ở miếng bánh đi kèm. Ghép đúng, vị cà phê và vị bánh nâng nhau lên; ghép sai, cả hai cùng nhạt. Dưới đây là vài nguyên tắc đơn giản quán rút ra sau nhiều lần thử — và sai.</p>
+<h2>Nguyên tắc 1: đậm đi với béo</h2>
+<p>Cà phê càng đậm, đắng (espresso, cà phê đen) càng cần món béo, ngọt để cân bằng. <strong>Tiramisu + espresso</strong> là cặp đôi kinh điển của Ý: lớp mascarpone béo ngậy ôm lấy vị đắng gọn của espresso, và bản thân tiramisu cũng thấm cà phê nên hai bên "cùng tần số".</p>
+<h2>Nguyên tắc 2: nhẹ đi với thanh</h2>
+<p>Đồ uống nhẹ như latte, cappuccino nên đi với bánh có cấu trúc rõ như <strong>croissant bơ</strong> — vỏ giòn, thơm bơ, không quá ngọt nên không lấn vị sữa. Trà và matcha thì hợp bánh ít béo, vị trái cây như <strong>cheesecake chanh dây</strong>: vị chua thanh của bánh làm nổi bật hậu vị trà.</p>
+<h2>Nguyên tắc 3: tránh "ngọt chồng ngọt"</h2>
+<p>Bạc xỉu, cà phê sữa vốn đã ngọt; ăn kèm bánh quá ngọt sẽ gây ngán nhanh. Hãy chọn <strong>flan cà phê</strong> (ngọt dịu, có vị cà phê nối vị) hoặc cookie socola chip hơi đắng nhẹ để giữ cân bằng.</p>
+<ul>
+<li>Espresso / đen đá → tiramisu, cookie socola chip</li>
+<li>Latte / cappuccino → croissant bơ, croissant socola</li>
+<li>Cold brew → bánh chuối nướng, tart trứng</li>
+<li>Matcha latte → cheesecake chanh dây, mousse chanh dây</li>
+<li>Bạc xỉu / cà phê sữa đá → flan cà phê, panna cotta</li>
+</ul>
+<blockquote>Mẹo của quán: luôn nhấp một ngụm cà phê trước, ăn một miếng bánh, rồi nhấp ngụm thứ hai — ngụm thứ hai là lúc hai vị hòa vào nhau rõ nhất.</blockquote>
+<p>Tất cả các cặp đôi trên đều có trong <a href="/menu">thực đơn của quán</a>. Ghé Happier Coffee và thử "ghép đôi" theo gu của riêng bạn nhé!</p>`,
+  },
+];
+
 async function main() {
   const [{ value: orderCount }] = await db
     .select({ value: count() })
@@ -596,14 +741,45 @@ async function main() {
       });
   }
 
+  for (const post of POST_SEED) {
+    await db
+      .insert(blogPosts)
+      .values({
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        coverImageUrl: post.coverImageUrl,
+        author: "Happier Coffee",
+        isPublished: true,
+        publishedAt: new Date(post.publishedAt),
+      })
+      .onConflictDoUpdate({
+        target: blogPosts.slug,
+        set: {
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          coverImageUrl: post.coverImageUrl,
+          author: "Happier Coffee",
+          isPublished: true,
+          publishedAt: new Date(post.publishedAt),
+          updatedAt: new Date(),
+        },
+      });
+  }
+
   const [{ value: categoryCount }] = await db
     .select({ value: count() })
     .from(categories);
   const [{ value: productCount }] = await db
     .select({ value: count() })
     .from(products);
+  const [{ value: postCount }] = await db
+    .select({ value: count() })
+    .from(blogPosts);
   console.log(
-    `Seed xong: ${categoryCount} categories, ${productCount} products.`,
+    `Seed xong: ${categoryCount} categories, ${productCount} products, ${postCount} blog posts.`,
   );
 }
 
