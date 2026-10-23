@@ -5,7 +5,8 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 // - Primary: nền --color-cta, chữ trắng (CTA chính, mỗi khối tối đa 1 nút)
 // - Secondary: viền --color-coffee, nền trong
 // - Ghost: chỉ chữ
-// Trạng thái: hover đậm hơn, disabled mờ 50% + không bấm được, focus có viền rõ.
+// Trạng thái: hover đậm hơn, pressed thu nhỏ 0.97 (micro-interaction
+// HAP-23 — DESIGN.md mục 9), disabled mờ 50% + không bấm được, focus có viền rõ.
 // Bo góc 12px (rounded-xl).
 
 type Variant = "primary" | "secondary" | "ghost";
@@ -18,7 +19,7 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-base font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-base font-medium transition duration-state ease-standard active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
 
 interface CommonProps {
   variant?: Variant;

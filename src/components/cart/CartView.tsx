@@ -24,7 +24,7 @@ import { formatVnd } from "@/lib/format";
 const MAX_QUANTITY = 99;
 
 const stepperButtonClasses =
-  "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-coffee transition hover:border-caramel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-coffee transition duration-state ease-standard active:scale-95 hover:border-caramel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
 
 function CartItemRow({ item }: { item: CartItem }) {
   const { updateQuantity, removeItem } = useCart();
@@ -64,7 +64,7 @@ function CartItemRow({ item }: { item: CartItem }) {
             type="button"
             onClick={() => removeItem(item.productId)}
             aria-label={`Xóa ${item.name} khỏi giỏ hàng`}
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition hover:bg-line/60 hover:text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition duration-state ease-standard active:scale-95 hover:bg-line/60 hover:text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
           >
             <Trash2 className="h-4 w-4" aria-hidden />
           </button>
@@ -90,7 +90,8 @@ function CartItemRow({ item }: { item: CartItem }) {
               <Minus className="h-4 w-4" aria-hidden />
             </button>
             <span
-              className="w-8 text-center font-bold text-coffee tabular-nums"
+              key={item.quantity}
+              className="inline-block w-8 animate-pop-soft text-center font-bold text-coffee tabular-nums"
               aria-live="polite"
             >
               {item.quantity}

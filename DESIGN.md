@@ -34,7 +34,7 @@
 - Lưới sản phẩm: 2 cột mobile, 3 cột tablet, 4 cột desktop.
 
 ## 5. Component
-- Button: Primary (nền --color-cta, chữ trắng), Secondary (viền --color-coffee, nền trong), Ghost (chỉ chữ). Trạng thái: hover đậm hơn 8%, disabled mờ 50% + không bấm được, focus có viền rõ.
+- Button: Primary (nền --color-cta, chữ trắng), Secondary (viền --color-coffee, nền trong), Ghost (chỉ chữ). Trạng thái: hover đậm hơn 8%, pressed thu nhỏ theo thang ở mục 9, disabled mờ 50% + không bấm được, focus có viền rõ.
 - ProductCard: ảnh 4:3, tên món, ghi chú ngắn, giá (700, --color-caramel), nút Thêm vào giỏ; hết hàng: ảnh xám + nhãn "Hết hàng".
 - Badge trạng thái đơn: Chờ xác nhận (warning) / Đang chuẩn bị (caramel) / Đang giao (coffee) / Đã giao (success) / Đã hủy (error).
 - Input: viền --color-line, bo 12px, nhãn phía trên, lỗi hiển thị chữ --color-error ngay dưới ô.
@@ -61,5 +61,17 @@
 - Nên: giữ toàn bộ chữ tiếng Việt có dấu đúng chuẩn.
 - Không nên: dùng màu ngoài bảng token; không dùng ảnh tỉ lệ tùy ý làm vỡ lưới; không đặt quá 1 CTA chính trong 1 khối.
 
-## 9. Changelog thiết kế
+## 9. Micro-interactions
+- Mục đích: mọi thao tác nhấn/bấm đều có phản hồi thị giác tức thì và nhất quán toàn site (storefront, auth, checkout, admin) — đặc biệt trên mobile, nơi không có hover.
+- Token thời lượng (khai báo trong globals.css qua @theme): `--duration-press` 100ms (phản hồi khi nhấn) / `--duration-state` 150ms (hover, chuyển trạng thái) / `--duration-enter` 250ms (phần tử xuất hiện).
+- Easing chuẩn: `--ease-standard` = cubic-bezier(0.2, 0, 0, 1) cho mọi transition/animation thuộc nhóm này.
+- Press scale (qua trạng thái :active, không dùng JS): nút 0.97; nút icon nhỏ (stepper +/-, nút xoá, icon header) 0.95; thẻ ProductCard 0.99.
+- Chỉ animate transform và opacity — không animate kích thước/vị trí gây layout shift (giữ hiệu năng của HAP-21).
+- Hiệu ứng xuất hiện (keyframes trong globals.css): `pop` cho badge số lượng giỏ hàng ở Header và icon check của trạng thái "Đã thêm"; `pop-soft` cho số lượng ở stepper (giỏ hàng, trang chi tiết). Cả hai chỉ chạy transform: scale.
+- Focus: vòng focus-visible màu caramel (--color-cta) thống nhất cho mọi phần tử tương tác.
+- Tap highlight: tắt -webkit-tap-highlight-color mặc định ở phần tử tương tác.
+- Giảm chuyển động: khi người dùng bật prefers-reduced-motion, mọi animation/transition (cả cũ lẫn mới) bị rút về ~0ms.
+
+## 10. Changelog thiết kế
 - v1 (2026-10-23): bản đầu theo khung AI-DLC Factory T2 — Duy đã duyệt tại cổng G2 ngày 2026-10-23.
+- v1.1 (2026-10-24): thêm mục 9 Micro-interactions (HAP-23).

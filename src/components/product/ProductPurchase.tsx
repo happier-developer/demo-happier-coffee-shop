@@ -32,7 +32,7 @@ export default function ProductPurchase({
   const increase = () => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1));
 
   const stepperButtonClasses =
-    "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface text-coffee transition hover:border-caramel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
+    "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface text-coffee transition duration-state ease-standard active:scale-95 hover:border-caramel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
 
   return (
     <div className="flex flex-col gap-3">
@@ -51,7 +51,8 @@ export default function ProductPurchase({
             <Minus className="h-4 w-4" aria-hidden />
           </button>
           <span
-            className="w-10 text-center font-bold text-coffee tabular-nums"
+            key={quantity}
+            className="inline-block w-10 animate-pop-soft text-center font-bold text-coffee tabular-nums"
             aria-live="polite"
           >
             {quantity}
