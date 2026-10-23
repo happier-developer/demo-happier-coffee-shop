@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CoffeeDropClickEffect from "@/components/ui/CoffeeDropClickEffect";
 import { CartProvider } from "@/lib/cart/cart-context";
 
 // Layout chung của storefront (route group (storefront) theo ARCHITECTURE.md
@@ -17,6 +18,9 @@ export default function StorefrontLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        {/* Hiệu ứng click giọt cà phê loang (HAP-24): chỉ storefront,
+            /admin dùng layout riêng nên không có hiệu ứng này. */}
+        <CoffeeDropClickEffect />
       </div>
     </CartProvider>
   );
