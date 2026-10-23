@@ -18,6 +18,7 @@ import {
   Ban,
   Banknote,
   ChefHat,
+  Loader2,
   PackageCheck,
   QrCode,
   Truck,
@@ -186,6 +187,19 @@ export default function OrderDetailActions({
           )
         ) : null}
       </div>
+
+      {/* Chỉ báo đang xử lý (HAP-26): khi Server Action đang chạy, mọi
+          nút đã disabled — thêm spinner + chữ để admin thấy hệ thống
+          đang làm việc thay vì tưởng trang đơ. */}
+      {busy ? (
+        <p
+          role="status"
+          className="flex items-center gap-2 text-sm text-muted"
+        >
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          Đang xử lý…
+        </p>
+      ) : null}
 
       {message ? (
         <p

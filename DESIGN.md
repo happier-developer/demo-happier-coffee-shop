@@ -71,9 +71,12 @@
 - Focus: vòng focus-visible màu caramel (--color-cta) thống nhất cho mọi phần tử tương tác.
 - Tap highlight: tắt -webkit-tap-highlight-color mặc định ở phần tử tương tác.
 - Giảm chuyển động: khi người dùng bật prefers-reduced-motion, mọi animation/transition (cả cũ lẫn mới) bị rút về ~0ms.
+- Loading & pending ở khu admin (HAP-26): mọi route /admin/* có skeleton (animate-pulse, khối bg-line bám layout thật: tiêu đề, thẻ, dòng bảng/form) hiện ngay khi điều hướng; thao tác ghi đang chạy phải có spinner + chữ "Đang xử lý…" kèm nút disabled — không để màn hình đứng yên không phản hồi. Dữ liệu admin/đơn hàng không cache nên skeleton là cách chữa "đơ", không phải cache.
+- Lối vào quản trị (HAP-25): nút "Quản trị" (icon LayoutDashboard, nền coffee chữ cream) ở Header storefront + khối "Khu vực quản trị" ở trang /account — chỉ render khi server xác nhận tài khoản là admin.
 - Hiệu ứng click "giọt cà phê loang" (HAP-24, chỉ storefront — không áp dụng admin): khi nhấn chuột/tap, một giọt cà phê loang ra tại đúng điểm nhấn như giọt rơi vào sữa, kèm 1 vòng gợn mờ, rồi fade hết. Token: `--duration-drop` 700ms, easing `--ease-standard`, kích thước tối đa 96px; giọt dùng radial-gradient từ token `--color-coffee` sang `--color-caramel` với alpha tối đa ~0.35 (không đậm hơn — tránh trông như vết lem). Keyframes trong globals.css: `coffee-drop` (giọt loang, scale 0.12 → 1) và `coffee-ring` (vòng gợn, scale 0.2 → 1.15), cả hai chỉ animate transform/opacity. Lớp hiệu ứng là overlay `pointer-events: none`, tối đa 5 giọt đồng thời, node tự dọn sau animation; khi prefers-reduced-motion bật thì tắt hoàn toàn (không sinh giọt).
 
 ## 10. Changelog thiết kế
 - v1 (2026-10-23): bản đầu theo khung AI-DLC Factory T2 — Duy đã duyệt tại cổng G2 ngày 2026-10-23.
 - v1.1 (2026-10-24): thêm mục 9 Micro-interactions (HAP-23).
 - v1.2 (2026-10-24): bổ sung hiệu ứng click "giọt cà phê loang" vào mục 9 (HAP-24).
+- v1.3 (2026-10-24): lối vào quản trị cho admin (HAP-25) + quy ước loading skeleton/pending ở khu admin (HAP-26), mục 9.

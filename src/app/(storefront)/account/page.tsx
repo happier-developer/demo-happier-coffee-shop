@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, ShoppingBag } from "lucide-react";
+import { ChevronRight, LayoutDashboard, ShoppingBag } from "lucide-react";
 import SignOutButton from "@/components/auth/SignOutButton";
 import {
   OrderStatusBadge,
@@ -9,6 +9,7 @@ import {
 } from "@/components/orders/OrderStatusBadge";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
+import { isAdminEmail } from "@/lib/auth/admin-emails";
 import { getCurrentUser } from "@/lib/auth/server";
 import type { Order } from "@/lib/db/schema";
 import { formatDateTimeVi, formatVnd } from "@/lib/format";
@@ -100,6 +101,27 @@ export default async function AccountPage() {
           <Button href="/menu">Xem menu</Button>
           <SignOutButton />
         </div>
+
+        {/* Lối vào Dashboard cho admin (HAP-25): isAdmin chốt ở SERVER
+            ngay tại trang này theo ADMIN_EMAILS — user thường không
+            nhận được khối này trong HTML. Guard /admin (HAP-15) vẫn là
+            tuyến bảo vệ thật khi bấm vào. */}
+        {isAdminEmail(user.email) && (
+          <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-coffee/25 bg-coffee/5 p-5">
+            <LayoutDashboard
+              className="h-8 w-8 shrink-0 text-coffee"
+              aria-hidden
+            />
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-coffee">Khu vực quản trị</p>
+              <p className="text-sm text-muted">
+                Tài khoản của bạn có quyền quản trị quán — quản lý sản
+                phẩm và đơn hàng trong Dashboard.
+              </p>
+            </div>
+            <Button href="/admin">Mở Dashboard</Button>
+          </div>
+        )}
 
         <section className="mt-10" aria-labelledby="order-history-title">
           <h2

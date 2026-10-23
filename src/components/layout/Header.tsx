@@ -7,8 +7,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Coffee, Menu as MenuIcon, ShoppingCart, User, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Coffee,
+  LayoutDashboard,
+  Menu as MenuIcon,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
 import Container from "@/components/ui/Container";
 import { mainNav, shopConfig } from "@/lib/config";
 import { useCart } from "@/lib/cart/cart-context";
@@ -72,6 +79,42 @@ export default function Header() {
   // /account. Mọi kiểm tra quyền thật vẫn ở server.
   const { data: sessionData } = authClient.useSession();
   const sessionUser = sessionData?.user ?? null;
+
+  // Nút "Quản trị" cho admin (HAP-25): client KHÔNG tự suy quyền từ
+  // email — hỏi /api/me, nơi server chốt isAdmin theo ADMIN_EMAILS và
+  // chỉ trả về một boolean. Mặc định false và chỉ bật sau khi server
+  // xác nhận, nên user thường/khách không bao giờ thấy nút nháy lên.
+  // Kết quả kiểm tra được gắn với đúng email đã hỏi: đổi tài khoản thì
+  // kết quả cũ tự vô hiệu khi suy ra isAdmin (không setState đồng bộ
+  // trong effect — theo quy ước lint của repo).
+  const [adminCheck, setAdminCheck] = useState<{
+    email: string;
+    isAdmin: boolean;
+  } | null>(null);
+  const sessionEmail = sessionUser?.email ?? null;
+  useEffect(() => {
+    if (!sessionEmail) return;
+    let cancelled = false;
+    fetch("/api/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : { isAdmin: false }))
+      .then((data: { isAdmin?: boolean }) => {
+        if (!cancelled) {
+          setAdminCheck({ email: sessionEmail, isAdmin: data.isAdmin === true });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAdminCheck({ email: sessionEmail, isAdmin: false });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionEmail]);
+  const isAdmin =
+    sessionEmail !== null &&
+    adminCheck?.email === sessionEmail &&
+    adminCheck.isAdmin;
   const accountLabel = sessionUser
     ? shortUserLabel(sessionUser.name, sessionUser.email)
     : "Tài khoản";
@@ -142,6 +185,17 @@ export default function Header() {
               )}
             </Link>
 
+            {isAdmin && (
+              <Link
+                href="/admin"
+                aria-label="Quản trị — mở Dashboard admin"
+                className="inline-flex items-center gap-2 rounded-full bg-coffee px-3 py-2 text-[15px] font-medium text-cream transition duration-state ease-standard active:scale-[0.97] hover:bg-cta focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta sm:px-4"
+              >
+                <LayoutDashboard className="h-5 w-5 shrink-0" aria-hidden />
+                <span className="hidden sm:inline">Quản trị</span>
+              </Link>
+            )}
+
             <Link
               href={accountHref}
               title={sessionUser ? sessionUser.email : undefined}
@@ -185,6 +239,18 @@ export default function Header() {
         >
           <Container>
             <ul className="flex flex-col py-2">
+              {isAdmin && (
+                <li>
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 rounded-xl px-3 py-3 text-base font-medium text-coffee transition duration-state ease-standard active:bg-line/60 hover:bg-line/50"
+                  >
+                    <LayoutDashboard className="h-5 w-5" aria-hidden />
+                    Quản trị — Dashboard
+                  </Link>
+                </li>
+              )}
               {mainNav.map((item) => (
                 <li key={item.href}>
                   <Link
