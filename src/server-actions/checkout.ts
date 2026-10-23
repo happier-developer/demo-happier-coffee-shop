@@ -5,10 +5,12 @@
 // có kiểm tra ở server.
 //
 // Action này KHÔNG tin dữ liệu client: validate lại toàn bộ input, và việc
-// tính tiền/đọc giá nằm trong createOrder (đọc giá từ DB). Khách vãng lai
-// đặt được với user_id = null; khi HAP-13 (Neon Auth) xong, action sẽ lấy
-// userId của phiên đăng nhập và truyền vào createOrder.
+// tính tiền/đọc giá nằm trong createOrder (đọc giá từ DB). User của đơn
+// được lấy từ PHIÊN ở server (HAP-13, getCurrentUser — không bao giờ nhận
+// userId từ client): khách đã đăng nhập thì đơn gắn user_id, khách vãng
+// lai đặt bình thường với user_id = null.
 
+import { getCurrentUser } from "@/lib/auth/server";
 import { createOrder, CreateOrderError } from "@/lib/orders/create-order";
 import {
   validateCheckoutInput,
@@ -41,7 +43,11 @@ export async function placeOrder(input: CheckoutInput): Promise<PlaceOrderResult
   }
 
   try {
-    const order = await createOrder(validation.data);
+    // Lấy phiên ở server để gắn đơn với tài khoản (nếu có). getCurrentUser
+    // không bao giờ throw — auth lỗi hạ tầng thì đơn vẫn được tạo dạng
+    // khách vãng lai, không chặn luồng mua hàng.
+    const currentUser = await getCurrentUser();
+    const order = await createOrder(validation.data, currentUser?.id ?? null);
     return {
       ok: true,
       code: order.code,

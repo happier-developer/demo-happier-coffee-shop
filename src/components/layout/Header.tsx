@@ -12,6 +12,21 @@ import { Coffee, Menu as MenuIcon, ShoppingCart, User, X } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { mainNav, shopConfig } from "@/lib/config";
 import { useCart } from "@/lib/cart/cart-context";
+import { authClient } from "@/lib/auth/client";
+
+/** Nhãn rút gọn cho nút tài khoản khi đã đăng nhập: ưu tiên tên gọi
+ *  (từ cuối của họ tên), không có tên thì dùng phần trước @ của email. */
+function shortUserLabel(name: string | undefined, email: string): string {
+  const trimmedName = (name ?? "").trim();
+  if (trimmedName) {
+    const firstName = trimmedName.split(/\s+/).at(-1) ?? trimmedName;
+    return firstName.length <= 14 ? firstName : `${firstName.slice(0, 13)}…`;
+  }
+  const localPart = email.split("@")[0] ?? email;
+  return localPart.length <= 14
+    ? localPart
+    : `${localPart.slice(0, 13)}…`;
+}
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
@@ -49,6 +64,18 @@ export default function Header() {
   const pathname = usePathname();
   const { totalQuantity, hydrated } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Phiên đăng nhập (HAP-13): đọc bằng client SDK của Neon Auth
+  // (useSession — dữ liệu phiên qua /api/auth/get-session). Chỉ để HIỂN
+  // THỊ: chưa đăng nhập (hoặc đang tải phiên) → nút "Tài khoản" trỏ trang
+  // đăng nhập như trước; đã đăng nhập → hiện tên/email rút gọn, trỏ
+  // /account. Mọi kiểm tra quyền thật vẫn ở server.
+  const { data: sessionData } = authClient.useSession();
+  const sessionUser = sessionData?.user ?? null;
+  const accountLabel = sessionUser
+    ? shortUserLabel(sessionUser.name, sessionUser.email)
+    : "Tài khoản";
+  const accountHref = sessionUser ? "/account" : "/auth/dang-nhap";
 
   // Đổi trang thì đóng menu mobile (mẫu điều chỉnh state khi render,
   // thay cho useEffect — theo khuyến nghị của React).
@@ -113,11 +140,19 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/auth/dang-nhap"
-              className="inline-flex items-center gap-2 rounded-full border border-coffee/25 px-3 py-2 text-[15px] font-medium text-coffee transition hover:border-coffee hover:bg-coffee hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta sm:px-4"
+              href={accountHref}
+              title={sessionUser ? sessionUser.email : undefined}
+              aria-label={
+                sessionUser
+                  ? `Tài khoản của ${sessionUser.name || sessionUser.email}`
+                  : "Tài khoản — đăng nhập"
+              }
+              className="inline-flex max-w-44 items-center gap-2 rounded-full border border-coffee/25 px-3 py-2 text-[15px] font-medium text-coffee transition hover:border-coffee hover:bg-coffee hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta sm:max-w-56 sm:px-4"
             >
-              <User className="h-5 w-5" aria-hidden />
-              <span className="hidden sm:inline">Tài khoản</span>
+              <User className="h-5 w-5 shrink-0" aria-hidden />
+              <span className="hidden truncate sm:inline">
+                {accountLabel}
+              </span>
             </Link>
 
             <button
