@@ -2,62 +2,39 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { and, asc, eq, ne } from "drizzle-orm";
 import { ArrowLeft, Coffee } from "lucide-react";
 import Container from "@/components/ui/Container";
 import ProductCard from "@/components/product/ProductCard";
 import ProductPurchase from "@/components/product/ProductPurchase";
 import { getDb } from "@/lib/db";
+import { products } from "@/lib/db/schema";
 import {
-  categories,
-  products,
-  type Product,
-} from "@/lib/db/schema";
+  getProductDetail,
+  type ProductDetail,
+} from "@/lib/products/catalog";
 import { aboutContent } from "@/lib/config";
 import { formatVnd } from "@/lib/format";
 
 // Trang chi tiết sản phẩm (HAP-10) theo DESIGN.md mục 6: ảnh lớn bên
 // trái, thông tin + chọn số lượng + Thêm vào giỏ bên phải. Slug sai →
-// 404 (notFound). Render phía server như các trang storefront khác.
-export const dynamic = "force-dynamic";
+// 404 (notFound). Từ HAP-21 trang được prerender tĩnh theo slug
+// (generateStaticParams) + ISR: dữ liệu đọc qua cache catalogue (tag
+// `catalog`) và admin sửa sản phẩm thì revalidatePath/revalidateTag làm
+// mới ngay; revalidate 3600s là lưới an toàn. Slug chưa prerender (món
+// mới tạo) vẫn render theo yêu cầu rồi vào cache như thường.
+export const revalidate = 3600;
 
-interface ProductDetail {
-  product: Product;
-  categoryName: string;
-  categorySlug: string;
-  related: Product[];
-}
-
-async function getProductDetail(slug: string): Promise<ProductDetail | null> {
-  const db = getDb();
-  const rows = await db
-    .select({ product: products, category: categories })
-    .from(products)
-    .innerJoin(categories, eq(products.categoryId, categories.id))
-    .where(eq(products.slug, slug))
-    .limit(1);
-
-  const row = rows[0];
-  if (!row) return null;
-
-  const related = await db
-    .select()
-    .from(products)
-    .where(
-      and(
-        eq(products.categoryId, row.product.categoryId),
-        ne(products.id, row.product.id),
-      ),
-    )
-    .orderBy(asc(products.sortOrder), asc(products.name))
-    .limit(4);
-
-  return {
-    product: row.product,
-    categoryName: row.category.name,
-    categorySlug: row.category.slug,
-    related,
-  };
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  try {
+    const db = getDb();
+    const rows = await db.select({ slug: products.slug }).from(products);
+    return rows.map((row) => ({ slug: row.slug }));
+  } catch (error) {
+    // Build không có DATABASE_URL (vd local) → không prerender slug nào;
+    // trang vẫn render theo yêu cầu ở runtime.
+    console.error("Không tải được slug cho generateStaticParams:", error);
+    return [];
+  }
 }
 
 // Metadata theo sản phẩm (HAP-10, mở rộng OG ở HAP-19): title = tên món

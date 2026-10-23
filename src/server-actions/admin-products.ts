@@ -11,8 +11,9 @@
 // hưởng để thay đổi phản ánh NGAY ra ngoài (trang chủ, /menu, chi tiết
 // món) cùng danh sách admin.
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth/admin";
+import { CATALOG_TAG } from "@/lib/products/catalog";
 import {
   categoryExists,
   countOrderItemsForProduct,
@@ -46,6 +47,13 @@ const GENERIC_ERROR_MESSAGE =
 const NOT_FOUND_MESSAGE = "Không tìm thấy sản phẩm này (có thể đã bị xoá).";
 
 function revalidateStorefront(slug?: string) {
+  // HAP-21: dữ liệu catalogue phía storefront nằm trong cache tag
+  // `catalog` (src/lib/products/catalog.ts) — updateTag làm cache hết hạn
+  // NGAY (không phục vụ bản cũ, đúng cam kết "phản ánh ngay" từ HAP-16)
+  // để MỌI đường đọc (trang chủ, menu, chi tiết, sitemap) thấy thay đổi,
+  // kể cả khi slug/nhóm của món thay đổi làm revalidatePath theo đường
+  // cũ sót.
+  updateTag(CATALOG_TAG);
   revalidatePath("/");
   revalidatePath("/menu");
   if (slug) revalidatePath(`/menu/${slug}`);

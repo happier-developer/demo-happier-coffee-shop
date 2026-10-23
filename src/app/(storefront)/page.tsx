@@ -1,7 +1,7 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { and, asc, eq } from "drizzle-orm";
 import {
   ArrowRight,
   Coffee,
@@ -13,16 +13,19 @@ import {
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import ProductCard from "@/components/product/ProductCard";
+import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 import { shopConfig } from "@/lib/config";
-import { getDb } from "@/lib/db";
-import { products, type Product } from "@/lib/db/schema";
+import type { Product } from "@/lib/db/schema";
+import { getFeaturedProducts } from "@/lib/products/catalog";
 
 // Trang chủ (HAP-9) theo pattern DESIGN.md mục 6:
 // Hero → Món nổi bật (từ DB) → Giới thiệu ngắn → Cách đặt hàng 3 bước.
-// Render phía server mỗi lần truy cập để món nổi bật luôn là dữ liệu thật
-// mới nhất từ DB; lỗi DB chỉ làm khối món hiện trạng thái trống, trang
-// vẫn hiển thị bình thường.
-export const dynamic = "force-dynamic";
+// Từ HAP-21 trang được prerender tĩnh (SSG/ISR): món nổi bật đọc qua
+// cache catalogue (tag `catalog`, xem src/lib/products/catalog.ts) và
+// được làm mới ngay khi admin sửa sản phẩm qua revalidatePath +
+// revalidateTag; revalidate 3600s là lưới an toàn. Lỗi DB chỉ làm khối
+// món hiện trạng thái trống, trang vẫn hiển thị bình thường.
+export const revalidate = 3600;
 
 // Metadata trang chủ (HAP-19): không khai title (dùng title mặc định ở
 // root layout), description + OG riêng với ảnh hero của trang chủ.
@@ -35,17 +38,9 @@ export const metadata: Metadata = {
   },
 };
 
-async function getFeaturedProducts(): Promise<Product[]> {
+async function loadFeaturedProducts(): Promise<Product[]> {
   try {
-    const db = getDb();
-    return await db
-      .select()
-      .from(products)
-      .where(
-        and(eq(products.isFeatured, true), eq(products.isAvailable, true)),
-      )
-      .orderBy(asc(products.sortOrder), asc(products.name))
-      .limit(8);
+    return await getFeaturedProducts();
   } catch (error) {
     console.error("Không tải được món nổi bật từ DB:", error);
     return [];
@@ -70,9 +65,50 @@ const orderSteps = [
   },
 ];
 
-export default async function HomePage() {
-  const featured = await getFeaturedProducts();
+// Khối lưới món nổi bật tách thành component async riêng để bọc Suspense
+// trong trang chủ (HAP-21): hero tĩnh hiện ngay, lưới món stream vào sau
+// kèm skeleton — KHÔNG dùng (storefront)/loading.tsx vì loading boundary
+// ở group sẽ áp cả cho /account và làm redirect 307 của guard tài khoản
+// biến thành redirect phía client (đã kiểm chứng, tránh được ở đây).
+async function FeaturedProductsGrid() {
+  const featured = await loadFeaturedProducts();
 
+  if (featured.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line bg-surface px-6 py-12 text-center">
+        <Coffee className="h-10 w-10 text-caramel" aria-hidden />
+        <p className="font-medium text-coffee">Menu đang được cập nhật</p>
+        <p className="max-w-md text-sm leading-relaxed text-muted">
+          Các món nổi bật sẽ sớm xuất hiện tại đây. Bạn vẫn có thể ghé quán
+          trực tiếp hoặc xem menu trong ít phút nữa.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+      {featured.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
+function FeaturedProductsSkeleton() {
+  return (
+    <div
+      aria-hidden
+      className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4"
+    >
+      {Array.from({ length: 4 }).map((_, index) => (
+        <ProductCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
+
+export default function HomePage() {
   return (
     <>
       {/* ---------- Hero ---------- */}
@@ -136,24 +172,9 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {featured.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-              {featured.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-line bg-surface px-6 py-12 text-center">
-              <Coffee className="h-10 w-10 text-caramel" aria-hidden />
-              <p className="font-medium text-coffee">
-                Menu đang được cập nhật
-              </p>
-              <p className="max-w-md text-sm leading-relaxed text-muted">
-                Các món nổi bật sẽ sớm xuất hiện tại đây. Bạn vẫn có thể ghé
-                quán trực tiếp hoặc xem menu trong ít phút nữa.
-              </p>
-            </div>
-          )}
+          <Suspense fallback={<FeaturedProductsSkeleton />}>
+            <FeaturedProductsGrid />
+          </Suspense>
         </Container>
       </section>
 
