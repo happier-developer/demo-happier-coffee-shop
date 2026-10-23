@@ -21,8 +21,15 @@ import { requireAdmin } from "@/lib/auth/admin";
 
 export const dynamic = "force-dynamic";
 
+// Title template riêng cho khu admin + noindex toàn khu (HAP-19): trang
+// con chỉ khai title ngắn ("Sản phẩm", "Đơn hàng"...) → hiển thị dạng
+// "<Trang> — Quản trị Happier Coffee".
 export const metadata: Metadata = {
-  title: "Quản trị — Happier Coffee",
+  title: {
+    default: "Quản trị — Happier Coffee",
+    template: "%s — Quản trị Happier Coffee",
+  },
+  robots: { index: false, follow: false },
 };
 
 // Mục điều hướng sidebar. `href: null` = mục chưa có trang (khung chờ

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { asc } from "drizzle-orm";
 import { Coffee } from "lucide-react";
+import { aboutContent } from "@/lib/config";
 import Container from "@/components/ui/Container";
 import ProductCard from "@/components/product/ProductCard";
 import { getDb } from "@/lib/db";
@@ -12,10 +13,17 @@ import {
   type Product,
 } from "@/lib/db/schema";
 
+// Title ngắn — root layout template tự thêm " — Happier Coffee" (HAP-19).
 export const metadata: Metadata = {
-  title: "Menu — Happier Coffee",
+  title: "Menu",
   description:
     "Thực đơn cà phê, trà và bánh của Happier Coffee — lọc theo nhóm món, giá rõ ràng.",
+  openGraph: {
+    title: "Menu — Happier Coffee",
+    description:
+      "Thực đơn cà phê, trà và bánh của Happier Coffee — lọc theo nhóm món, giá rõ ràng.",
+    images: [{ url: aboutContent.heroImage, alt: aboutContent.heroImageAlt }],
+  },
 };
 
 // Trang Menu (HAP-10) theo DESIGN.md mục 6: thanh lọc theo nhóm món trên

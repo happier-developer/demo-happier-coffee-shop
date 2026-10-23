@@ -25,8 +25,10 @@ import { listOrdersForUser } from "@/lib/orders/history";
 // Trang đọc cookie phiên nên bắt buộc dynamic.
 export const dynamic = "force-dynamic";
 
+// Khu tài khoản cá nhân — noindex (HAP-19).
 export const metadata: Metadata = {
-  title: "Tài khoản của tôi — Happier Coffee",
+  title: "Tài khoản của tôi",
+  robots: { index: false, follow: false },
 };
 
 function formatMemberSince(iso: string | null): string | null {

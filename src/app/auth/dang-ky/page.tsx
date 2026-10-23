@@ -5,7 +5,7 @@ import { safeNextPath } from "@/lib/auth/paths";
 // Trang đăng ký (HAP-13). `next` được chuẩn hoá bằng safeNextPath giống
 // trang đăng nhập (chỉ đường dẫn nội bộ, chống open-redirect).
 export const metadata: Metadata = {
-  title: "Đăng ký tài khoản — Happier Coffee",
+  title: "Đăng ký tài khoản",
 };
 
 export default async function SignUpPage({

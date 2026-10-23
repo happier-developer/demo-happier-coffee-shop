@@ -21,8 +21,10 @@ import { PAYMENT_METHOD_LABELS } from "@/lib/orders/status";
 // Trang đọc cookie phiên + DB nên bắt buộc dynamic.
 export const dynamic = "force-dynamic";
 
+// Khu tài khoản cá nhân — noindex (HAP-19).
 export const metadata: Metadata = {
-  title: "Chi tiết đơn hàng — Happier Coffee",
+  title: "Chi tiết đơn hàng",
+  robots: { index: false, follow: false },
 };
 
 interface PageProps {

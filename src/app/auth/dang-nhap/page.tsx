@@ -7,7 +7,7 @@ import { safeNextPath } from "@/lib/auth/paths";
 //   (chỉ đường dẫn nội bộ, chống open-redirect).
 // - registered=1: vừa đăng ký xong nhưng chưa có phiên → hiện thông báo.
 export const metadata: Metadata = {
-  title: "Đăng nhập — Happier Coffee",
+  title: "Đăng nhập",
 };
 
 export default async function SignInPage({

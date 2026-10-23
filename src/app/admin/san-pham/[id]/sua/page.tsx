@@ -15,7 +15,7 @@ import type { Category, Product } from "@/lib/db/schema";
 // sẻ — lưu ý này cũng hiển thị ngay trong form.
 
 export const metadata: Metadata = {
-  title: "Sửa sản phẩm — Quản trị Happier Coffee",
+  title: "Sửa sản phẩm",
 };
 
 const UUID_PATTERN =
