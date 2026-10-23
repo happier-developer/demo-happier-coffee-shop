@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { and, asc, eq } from "drizzle-orm";
@@ -22,6 +23,17 @@ import { products, type Product } from "@/lib/db/schema";
 // mới nhất từ DB; lỗi DB chỉ làm khối món hiện trạng thái trống, trang
 // vẫn hiển thị bình thường.
 export const dynamic = "force-dynamic";
+
+// Metadata trang chủ (HAP-19): không khai title (dùng title mặc định ở
+// root layout), description + OG riêng với ảnh hero của trang chủ.
+export const metadata: Metadata = {
+  description: shopConfig.description,
+  openGraph: {
+    title: `${shopConfig.name} — ${shopConfig.tagline}`,
+    description: shopConfig.description,
+    images: [{ url: shopConfig.heroImage, alt: shopConfig.name }],
+  },
+};
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {

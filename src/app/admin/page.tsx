@@ -7,7 +7,7 @@ import { ClipboardList, Package } from "lucide-react";
 // — HAP-16, Đơn hàng — HAP-17) nên đều là link điều hướng.
 
 export const metadata: Metadata = {
-  title: "Tổng quan quản trị — Happier Coffee",
+  title: "Tổng quan",
 };
 
 const SECTIONS = [

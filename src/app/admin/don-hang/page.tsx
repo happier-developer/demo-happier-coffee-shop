@@ -23,7 +23,7 @@ import { ORDER_STATUSES, type Order, type OrderStatus } from "@/lib/db/schema";
 // ĐỌC dữ liệu. Đơn mới nhất xếp trước, tối đa ADMIN_ORDERS_LIMIT đơn.
 
 export const metadata: Metadata = {
-  title: "Đơn hàng — Quản trị Happier Coffee",
+  title: "Đơn hàng",
 };
 
 interface PageProps {

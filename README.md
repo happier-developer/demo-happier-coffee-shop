@@ -166,3 +166,42 @@ từng Server Action admin — header/client không quyết định quyền.
   toàn, không phải lỗi.
 - Muốn thu hồi quyền của ai: xoá email của họ khỏi `ADMIN_EMAILS` rồi
   redeploy.
+
+## Deploy & môi trường (HAP-19)
+
+Site chạy trên **Vercel** (project `demo-happier-coffee-shop`, nối trực
+tiếp repo GitHub này, production branch = `main`):
+
+- Mở **Pull Request** → Vercel tự tạo **Preview deployment** có URL riêng
+  cho branch đó; kiểm chứng trên Preview trước khi merge.
+- **Merge vào `main`** → Vercel tự deploy **Production**:
+  https://demo-happier-coffee-shop.vercel.app
+- GitHub Actions (CI) chạy lint + build trên mỗi PR — không merge khi CI đỏ.
+
+### Biến môi trường trên Vercel
+
+Chỉ quản lý trên Vercel (Settings → Environment Variables), **không** ghi
+giá trị thật vào repo. Đổi env phải redeploy mới có hiệu lực.
+
+| Biến | Dùng để làm gì | Target |
+| --- | --- | --- |
+| `DATABASE_URL` (+ bộ `POSTGRES_*`) | Kết nối Neon Postgres — do tích hợp Neon trên Vercel tự cấp & quản lý (integration store secret) | Production + Preview |
+| `NEON_AUTH_BASE_URL` | Địa chỉ Neon Auth của project (đăng ký/đăng nhập/phiên) | Production + Preview |
+| `NEON_AUTH_COOKIE_SECRET` | Ký cookie phiên Neon Auth | Production + Preview |
+| `ADMIN_EMAILS` | Danh sách email có quyền admin (xem mục "Quản trị viên" ở trên) | Production + Preview |
+| `NEXT_PUBLIC_BANK_*` (tuỳ chọn) | Thông tin VietQR thật của quán; chưa đặt thì checkout dùng bộ demo ghi rõ trong `src/lib/config.ts` | Production + Preview |
+
+### Lưu ý vận hành
+
+- **Neon Auth trusted domains:** domain của site phải nằm trong danh sách
+  trusted domains của Neon Auth (Neon Console → Settings → Better Auth →
+  Domains), nếu không đăng ký/đăng nhập từ trình duyệt bị chặn với lỗi
+  `INVALID_ORIGIN` (đã gặp ở HAP-13). Domain production đã được thêm;
+  domain Preview (`*.vercel.app`) muốn test đăng nhập phải thêm riêng
+  từng domain. Đổi domain chính thức (siteUrl trong `src/lib/config.ts`)
+  thì phải thêm domain mới vào đây.
+- **SEO:** metadata/Open Graph khai ở root layout (`src/app/layout.tsx`)
+  + từng trang; `sitemap.xml` tự sinh từ DB (route tĩnh + slug sản phẩm),
+  `robots.txt` chặn các khu riêng tư. URL gốc của site nằm ở hằng số
+  `siteUrl` trong `src/lib/config.ts` — nguồn duy nhất, đổi domain chỉ
+  sửa một chỗ.
