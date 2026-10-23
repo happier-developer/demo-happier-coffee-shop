@@ -28,6 +28,36 @@
   --animate-pop: pop var(--duration-enter) var(--ease-standard);
   --animate-pop-soft: pop-soft var(--duration-state) var(--ease-standard);
 
+  /* Hiệu ứng click "giọt cà phê loang" (HAP-24 — DESIGN.md mục 9):
+     chỉ storefront, gắn bởi CoffeeDropClickEffect. */
+  --duration-drop: 700ms;
+  --animate-coffee-drop: coffee-drop var(--duration-drop) var(--ease-standard)
+    forwards;
+  --animate-coffee-ring: coffee-ring var(--duration-drop) var(--ease-standard)
+    forwards;
+
+  @keyframes coffee-drop {
+    0% {
+      transform: scale(0.12);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  @keyframes coffee-ring {
+    0% {
+      transform: scale(0.2);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.15);
+      opacity: 0;
+    }
+  }
+
   @keyframes pop {
     0% {
       transform: scale(0.4);
