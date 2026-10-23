@@ -26,7 +26,8 @@ export const metadata: Metadata = {
 };
 
 // Mục điều hướng sidebar. `href: null` = mục chưa có trang (khung chờ
-// HAP-17), hiển thị mờ kèm nhãn "Sắp có" thay vì link chết 404.
+// issue sau), hiển thị mờ kèm nhãn "Sắp có" thay vì link chết 404.
+// Cả 3 mục đã có trang thật (Sản phẩm — HAP-16, Đơn hàng — HAP-17).
 const NAV_ITEMS: Array<{
   label: string;
   href: string | null;
@@ -35,7 +36,7 @@ const NAV_ITEMS: Array<{
 }> = [
   { label: "Tổng quan", href: "/admin", note: null, icon: LayoutDashboard },
   { label: "Sản phẩm", href: "/admin/san-pham", note: null, icon: Package },
-  { label: "Đơn hàng", href: null, note: "HAP-17", icon: ClipboardList },
+  { label: "Đơn hàng", href: "/admin/don-hang", note: null, icon: ClipboardList },
 ];
 
 export default async function AdminLayout({

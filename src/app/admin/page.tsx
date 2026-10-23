@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ClipboardList, Package } from "lucide-react";
 
 // Trang Tổng quan khu quản trị (HAP-15) — guard đã nằm ở layout (chỉ
-// admin mới tới được đây). Khối Sản phẩm đã có trang thật từ HAP-16 nên
-// là link điều hướng; khối Đơn hàng chờ HAP-17, giữ trạng thái "Sắp có".
+// admin mới tới được đây). Cả hai khối đều đã có trang thật (Sản phẩm
+// — HAP-16, Đơn hàng — HAP-17) nên đều là link điều hướng.
 
 export const metadata: Metadata = {
   title: "Tổng quan quản trị — Happier Coffee",
@@ -21,8 +21,8 @@ const SECTIONS = [
   },
   {
     title: "Đơn hàng",
-    issue: "HAP-17",
-    href: null,
+    issue: null,
+    href: "/admin/don-hang",
     icon: ClipboardList,
     description:
       "Xem đơn khách đặt, xác nhận thanh toán VietQR/COD và chuyển trạng thái đơn (đang chuẩn bị, đang giao, đã giao, huỷ).",
