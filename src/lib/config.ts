@@ -39,6 +39,93 @@ export const shopConfig = {
   ],
 } as const;
 
+// --- Nội dung trang Giới thiệu + Liên hệ (HAP-18) --------------------------
+// ⚠️ NỘI DUNG MẪU — thay bằng nội dung thật ở HAP-20. Toàn bộ chữ hiển thị
+// trên 2 trang /gioi-thieu và /lien-he nằm ở khối này (cùng shopConfig phía
+// trên cho địa chỉ/giờ/SĐT/email), trang chỉ render từ config, không hardcode
+// text trong JSX — khi có nội dung thật chỉ sửa đúng file này.
+
+export const aboutContent = {
+  // Ảnh mẫu Unsplash chủ đề cà phê (DESIGN.md mục 7) — thay ảnh thật ở HAP-20.
+  heroImage:
+    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1600&auto=format&fit=crop",
+  heroImageAlt: "Ly cà phê cùng hạt cà phê rang (ảnh mẫu)",
+  heading: "Câu chuyện của Happier Coffee",
+  lead: "Một quán cà phê Việt Nam nhỏ ở Quận 1 — nơi hạt cà phê rang mới, không gian ấm cúng và những ly đồ uống làm tử tế gặp nhau.",
+  storyTitle: "Bắt đầu từ một ly cà phê tử tế",
+  storyImage:
+    "https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=1200&auto=format&fit=crop",
+  storyImageAlt: "Barista đang rót sữa tạo hình trên ly cà phê (ảnh mẫu)",
+  story: [
+    "Happier Coffee bắt đầu từ một quầy cà phê nhỏ với mong muốn giản dị: ai ghé quán cũng có một ly cà phê tử tế — hạt ngon, pha đúng gu, giá dễ chịu — và vài phút thảnh thơi giữa một ngày bận rộn.",
+    "Quán chọn hạt Robusta từ Đắk Lắk và Arabica từ Cầu Đất, rang theo mẻ nhỏ mỗi tuần để giữ trọn hương thơm. Bên cạnh phin truyền thống, thực đơn có espresso, cold brew ủ chậm 16 giờ, trà trái cây tươi và matcha — và được làm mới theo mùa.",
+    "Từ ngày bán thêm online, Happier Coffee vẫn giữ nguyên cách làm đó: mỗi đơn hàng chỉ được pha sau khi bạn đặt, đóng gói cẩn thận và giao nhanh, để ly cà phê tới tay vẫn ngon như uống tại quán.",
+  ],
+  highlightsTitle: "Điều làm nên Happier Coffee",
+  highlightsIntro:
+    "Bốn điều quán luôn giữ, từ ly cà phê tại quầy tới đơn hàng giao tận nơi.",
+  // icon: khóa tra sang component Lucide ở trang Giới thiệu.
+  highlights: [
+    {
+      icon: "coffee",
+      title: "Hạt Việt, rang mới mỗi tuần",
+      text: "Robusta Đắk Lắk và Arabica Cầu Đất rang theo mẻ nhỏ, xay ngay trước khi pha để hương vị luôn tươi và đậm.",
+    },
+    {
+      icon: "leaf",
+      title: "Nguyên liệu tươi trong ngày",
+      text: "Sữa tươi, trái cây theo mùa và bánh nướng tại quán mỗi sáng — quán không dùng hương liệu công nghiệp.",
+    },
+    {
+      icon: "zap",
+      title: "Pha sau khi đặt, giao nhanh",
+      text: "Đơn online chỉ bắt đầu pha khi bạn xác nhận, đóng gói giữ nhiệt và giao nhanh trong khu vực trung tâm.",
+    },
+    {
+      icon: "heart",
+      title: "Giá dễ chịu, phục vụ tận tâm",
+      text: "Thực đơn từ 25.000₫ và barista luôn sẵn sàng chỉnh độ ngọt, lượng đá, gu cà phê theo đúng sở thích của bạn.",
+    },
+  ],
+  cta: {
+    title: "Thèm một ly cà phê ngon?",
+    text: "Xem thực đơn hôm nay và đặt món — quán pha ngay sau khi bạn đặt.",
+    buttonLabel: "Xem menu",
+    href: "/menu",
+  },
+} as const;
+
+export const contactContent = {
+  heading: "Liên hệ với quán",
+  lead: "Ghé quán thưởng thức tại chỗ, gọi điện đặt trước hoặc nhắn Zalo — đội ngũ Happier Coffee luôn sẵn sàng hỗ trợ bạn.",
+  infoTitle: "Thông tin quán",
+  mapTitle: "Bản đồ vị trí Happier Coffee",
+  directionsLabel: "Mở chỉ đường",
+  callLabel: "Gọi ngay",
+  zaloLabel: "Nhắn Zalo",
+  cta: {
+    title: "Không tiện ghé quán? Đặt online, giao tận nơi",
+    text: "Toàn bộ thực đơn đều có trên website — đặt món trong vài phút, quán xác nhận và giao nhanh tới bạn.",
+    buttonLabel: "Xem menu",
+    href: "/menu",
+  },
+} as const;
+
+// Link Zalo suy ra từ SĐT trong shopConfig (bỏ khoảng trắng) — thay SĐT ở
+// shopConfig là link tự cập nhật, không phải sửa thêm chỗ nào khác.
+export const zaloHref = `https://zalo.me/${shopConfig.phone.replace(/\s+/g, "")}`;
+
+// Nhúng bản đồ Google Maps không cần API key: truy vấn chính địa chỉ trong
+// shopConfig, output=embed để dùng trong iframe.
+export const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(
+  shopConfig.address,
+)}&output=embed`;
+
+// Link mở Google Maps (ứng dụng/web) tới đúng địa chỉ quán.
+export const mapDirectionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  shopConfig.address,
+)}`;
+
 export const mainNav = [
   { label: "Trang chủ", href: "/" },
   { label: "Menu", href: "/menu" },
