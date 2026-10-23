@@ -75,6 +75,8 @@
 - Lối vào quản trị (HAP-25): nút "Quản trị" (icon LayoutDashboard, nền coffee chữ cream) ở Header storefront + khối "Khu vực quản trị" ở trang /account — chỉ render khi server xác nhận tài khoản là admin.
 - Hiệu ứng click "giọt cà phê loang" (HAP-24, chỉ storefront — không áp dụng admin): khi nhấn chuột/tap, một giọt cà phê loang ra tại đúng điểm nhấn như giọt rơi vào sữa, kèm 1 vòng gợn mờ, rồi fade hết. Token: `--duration-drop` 700ms, easing `--ease-standard`, kích thước tối đa 56px (thu nhỏ từ 96px theo yêu cầu của Duy khi nghiệm thu HAP-24); giọt dùng radial-gradient từ token `--color-coffee` sang `--color-caramel` với alpha tối đa ~0.35 (không đậm hơn — tránh trông như vết lem). Keyframes trong globals.css: `coffee-drop` (giọt loang, scale 0.12 → 1) và `coffee-ring` (vòng gợn, scale 0.2 → 1.15), cả hai chỉ animate transform/opacity. Lớp hiệu ứng là overlay `pointer-events: none`, tối đa 5 giọt đồng thời, node tự dọn sau animation; khi prefers-reduced-motion bật thì tắt hoàn toàn (không sinh giọt).
 
+- Stepper số lượng kiểu Shopee (HAP-29): khi món đã có trong giỏ, nút "Thêm vào giỏ" trên thẻ sản phẩm tự chuyển thành stepper [−] số [+] đồng bộ với giỏ (nút 36px ở thẻ, 44px ở trang chi tiết; viền line, nền surface, hover viền caramel, press scale 0.95; số lượng bold tabular-nums ở giữa, `pop-soft` khi đổi số). Giảm về 0 → món rời giỏ, nút trở về "Thêm vào giỏ". Món hết hàng không hiện stepper (giữ trạng thái khóa). Chiều cao stepper bằng chiều cao nút thêm để thẻ không nhảy layout.
+
 ## 10. Blog (HAP-28)
 
 - **Danh sách /blog:** lưới thẻ bài (ảnh bìa 16:9, meta ngày · tác giả chữ nhỏ uppercase màu muted, tiêu đề bold màu coffee — hover chuyển caramel, excerpt tối đa 3 dòng, liên kết "Đọc tiếp →"). Thẻ là một liên kết duy nhất tới bài viết.
@@ -89,3 +91,4 @@
 - v1.3 (2026-10-24): lối vào quản trị cho admin (HAP-25) + quy ước loading skeleton/pending ở khu admin (HAP-26), mục 9.
 - v1.4 (2026-10-24): thu nhỏ hiệu ứng giọt cà phê loang từ 96px xuống 56px (HAP-24).
 - v1.5 (2026-10-24): mục 10 mới — quy ước Blog (thẻ bài, khổ đọc .post-content, editor Tiptap trong admin, nhãn Nháp/Đã xuất bản) cho HAP-28.
+- v1.6 (2026-10-24): quy ước stepper số lượng kiểu Shopee cho nút Thêm vào giỏ (HAP-29), bổ sung ở mục 9.
