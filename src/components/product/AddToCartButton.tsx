@@ -1,11 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Check, ShoppingCart } from "lucide-react";
+import { useRef } from "react";
+import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart/cart-context";
+import QuantityStepper from "./QuantityStepper";
 
-// Nút "Thêm vào giỏ" của ProductCard (HAP-9): nối vào CartProvider có sẵn
-// (localStorage theo Quyết định A2). Trang giỏ hàng/checkout là HAP-11/12.
+// Nút "Thêm vào giỏ" của ProductCard (HAP-9) + behavior stepper
+// (HAP-29): khi món ĐÃ có trong giỏ, nút tự chuyển thành bộ điều
+// chỉnh số lượng [−] n [+] (QuantityStepper) đồng bộ với giỏ — khách
+// tăng/giảm ngay tại thẻ, giảm về 0 thì quay lại nút thêm. Món hết
+// hàng (disabled) giữ nguyên trạng thái khóa, không hiện stepper.
+//
+// Hồi quy HAP-22 (bấm đúp cộng trùng): lần bấm thêm đầu tiên được
+// khóa bằng mốc thời gian 400ms (addLockRef) — các click dồn dập
+// trong khoảnh khắc chuyển trạng thái bị bỏ qua; sau khi giỏ cập
+// nhật, vị trí giữa nút cũ là con số (không bấm được) nên click thừa
+// cũng không rơi vào nút +. Từ trạng thái stepper, mỗi lần +/− là
+// thao tác chủ ý và áp dụng đúng từng lần qua updateQuantity.
 interface AddToCartButtonProps {
   productId: string;
   slug: string;
@@ -17,6 +28,8 @@ interface AddToCartButtonProps {
   disabled?: boolean;
 }
 
+const ADD_LOCK_MS = 400;
+
 export default function AddToCartButton({
   productId,
   slug,
@@ -26,46 +39,36 @@ export default function AddToCartButton({
   quantity = 1,
   disabled = false,
 }: AddToCartButtonProps) {
-  const { addItem } = useCart();
-  const [added, setAdded] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { addItem, items, hydrated } = useCart();
+  const lastAddAtRef = useRef(0);
 
-  useEffect(
-    () => () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    },
-    [],
-  );
+  const cartQuantity = hydrated
+    ? (items.find((item) => item.productId === productId)?.quantity ?? 0)
+    : 0;
+
+  // Món đã có trong giỏ → stepper thay cho nút thêm (trừ khi hết hàng:
+  // disabled thắng, giữ trạng thái khóa như cũ).
+  if (!disabled && cartQuantity > 0) {
+    return <QuantityStepper productId={productId} name={name} size="card" />;
+  }
 
   const handleClick = () => {
-    // HAP-22 (Bug 1): trong trạng thái "Đã thêm" nút phải khóa — bấm lại
-    // không được cộng thêm vào giỏ. Chặn ở handler (phòng thủ) lẫn
-    // thuộc tính disabled bên dưới.
-    if (disabled || added) return;
+    if (disabled) return;
+    const now = Date.now();
+    if (now - lastAddAtRef.current < ADD_LOCK_MS) return;
+    lastAddAtRef.current = now;
     addItem({ productId, slug, name, priceVnd, imageUrl }, quantity);
-    setAdded(true);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setAdded(false), 1500);
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={disabled || added}
-      aria-live="polite"
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-cta px-3.5 py-2 text-sm font-medium whitespace-nowrap text-white transition duration-state ease-standard active:scale-[0.97] hover:bg-coffee focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none ${
-        // Chỉ mờ khi hết hàng (disabled từ props); trạng thái "Đã thêm"
-        // giữ nguyên màu để khách thấy xác nhận rõ ràng.
-        disabled && !added ? "disabled:opacity-50" : "disabled:opacity-100"
-      }`}
+      disabled={disabled}
+      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-cta px-3.5 py-2 text-sm font-medium whitespace-nowrap text-white transition duration-state ease-standard active:scale-[0.97] hover:bg-coffee focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50"
     >
-      {added ? (
-        <Check className="h-4 w-4 animate-pop" aria-hidden />
-      ) : (
-        <ShoppingCart className="h-4 w-4" aria-hidden />
-      )}
-      {added ? "Đã thêm" : "Thêm vào giỏ"}
+      <ShoppingCart className="h-4 w-4" aria-hidden />
+      Thêm vào giỏ
     </button>
   );
 }

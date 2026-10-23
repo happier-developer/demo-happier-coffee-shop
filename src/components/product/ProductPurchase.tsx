@@ -3,10 +3,15 @@
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import AddToCartButton from "./AddToCartButton";
+import QuantityStepper from "./QuantityStepper";
+import { useCart } from "@/lib/cart/cart-context";
 
 // Khối mua hàng ở trang chi tiết sản phẩm (HAP-10) theo DESIGN.md mục 6:
-// chọn số lượng + nút Thêm vào giỏ. Món hết hàng (isAvailable = false):
-// toàn bộ điều khiển bị vô hiệu hóa, không gọi được addItem.
+// chọn số lượng + nút Thêm vào giỏ. Từ HAP-29: khi món ĐÃ có trong giỏ,
+// khối mua hàng chuyển sang stepper đồng bộ với giỏ (QuantityStepper
+// cỡ detail) kèm dòng trạng thái — khách chỉnh số lượng ngay tại đây
+// thay vì chọn lại số rồi bấm thêm chồng lên. Món hết hàng
+// (isAvailable = false): toàn bộ điều khiển bị vô hiệu hóa.
 interface ProductPurchaseProps {
   productId: string;
   slug: string;
@@ -27,12 +32,32 @@ export default function ProductPurchase({
   disabled = false,
 }: ProductPurchaseProps) {
   const [quantity, setQuantity] = useState(1);
+  const { items, hydrated } = useCart();
+  const cartQuantity = hydrated
+    ? (items.find((item) => item.productId === productId)?.quantity ?? 0)
+    : 0;
 
   const decrease = () => setQuantity((q) => Math.max(1, q - 1));
   const increase = () => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1));
 
   const stepperButtonClasses =
     "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface text-coffee transition duration-state ease-standard active:scale-95 hover:border-caramel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
+
+  // Đã có trong giỏ → stepper đồng bộ (trừ khi món vừa hết hàng:
+  // giữ toàn bộ điều khiển bị khóa như trước).
+  if (!disabled && cartQuantity > 0) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <QuantityStepper productId={productId} name={name} size="detail" />
+          <p className="text-sm text-muted" role="status">
+            Đã có {cartQuantity} trong giỏ — chỉnh số lượng ngay tại đây
+            hoặc trong giỏ hàng.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">
