@@ -9,6 +9,7 @@ import {
   QrCode,
   ShoppingBag,
 } from "lucide-react";
+import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import { Field, Input, Textarea } from "@/components/ui/Input";
@@ -58,16 +59,6 @@ const paymentOptions: ReadonlyArray<{
   },
 ];
 
-function OrderStatusBadge() {
-  // Badge trạng thái đơn theo DESIGN.md mục 5: luôn có màu + chữ đi kèm.
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1 text-sm font-medium text-coffee">
-      <span className="h-2 w-2 rounded-full bg-warning" aria-hidden />
-      Chờ xác nhận
-    </span>
-  );
-}
-
 function CheckoutSuccess({ success }: { success: SuccessState }) {
   const isVietQr = success.paymentMethod === "vietqr";
   return (
@@ -91,7 +82,7 @@ function CheckoutSuccess({ success }: { success: SuccessState }) {
             {success.code}
           </p>
           <div className="mt-3 flex justify-center">
-            <OrderStatusBadge />
+            <OrderStatusBadge status="pending_confirmation" />
           </div>
           <p className="mt-3 text-base">
             Tổng tiền:{" "}
