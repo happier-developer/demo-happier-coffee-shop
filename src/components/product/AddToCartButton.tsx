@@ -12,6 +12,8 @@ interface AddToCartButtonProps {
   name: string;
   priceVnd: number;
   imageUrl?: string | null;
+  /** Số lượng thêm mỗi lần bấm (trang chi tiết chọn số lượng — HAP-10). Mặc định 1. */
+  quantity?: number;
   disabled?: boolean;
 }
 
@@ -21,6 +23,7 @@ export default function AddToCartButton({
   name,
   priceVnd,
   imageUrl,
+  quantity = 1,
   disabled = false,
 }: AddToCartButtonProps) {
   const { addItem } = useCart();
@@ -35,7 +38,7 @@ export default function AddToCartButton({
   );
 
   const handleClick = () => {
-    addItem({ productId, slug, name, priceVnd, imageUrl });
+    addItem({ productId, slug, name, priceVnd, imageUrl }, quantity);
     setAdded(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setAdded(false), 1500);
