@@ -49,10 +49,10 @@ function NavLink({
       href={href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={`rounded-full px-3 py-2 text-[15px] transition ${
+      className={`rounded-full px-3 py-2 text-[15px] transition duration-state ease-standard active:scale-[0.97] ${
         active
           ? "font-semibold text-coffee underline decoration-caramel decoration-2 underline-offset-8"
-          : "text-muted hover:bg-line/50 hover:text-coffee"
+          : "text-muted hover:bg-line/50 hover:text-coffee active:bg-line/60"
       }`}
     >
       {label}
@@ -129,11 +129,14 @@ export default function Header() {
                   ? `Giỏ hàng, ${totalQuantity} món`
                   : "Giỏ hàng"
               }
-              className="relative rounded-full p-2 text-coffee transition hover:bg-line/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
+              className="relative rounded-full p-2 text-coffee transition duration-state ease-standard active:scale-95 hover:bg-line/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta"
             >
               <ShoppingCart className="h-6 w-6" aria-hidden />
               {showBadge && (
-                <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-cta px-1 text-[11px] font-bold text-white">
+                <span
+                  key={totalQuantity}
+                  className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 animate-pop place-items-center rounded-full bg-cta px-1 text-[11px] font-bold text-white"
+                >
                   {totalQuantity}
                 </span>
               )}
@@ -147,7 +150,7 @@ export default function Header() {
                   ? `Tài khoản của ${sessionUser.name || sessionUser.email}`
                   : "Tài khoản — đăng nhập"
               }
-              className="inline-flex max-w-44 items-center gap-2 rounded-full border border-coffee/25 px-3 py-2 text-[15px] font-medium text-coffee transition hover:border-coffee hover:bg-coffee hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta sm:max-w-56 sm:px-4"
+              className="inline-flex max-w-44 items-center gap-2 rounded-full border border-coffee/25 px-3 py-2 text-[15px] font-medium text-coffee transition duration-state ease-standard active:scale-[0.97] hover:border-coffee hover:bg-coffee hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta sm:max-w-56 sm:px-4"
             >
               <User className="h-5 w-5 shrink-0" aria-hidden />
               <span className="hidden truncate sm:inline">
@@ -157,7 +160,7 @@ export default function Header() {
 
             <button
               type="button"
-              className="rounded-full p-2 text-coffee transition hover:bg-line/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta md:hidden"
+              className="rounded-full p-2 text-coffee transition duration-state ease-standard active:scale-95 hover:bg-line/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta md:hidden"
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
               aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
@@ -190,7 +193,7 @@ export default function Header() {
                     aria-current={
                       isActive(pathname, item.href) ? "page" : undefined
                     }
-                    className={`block rounded-xl px-3 py-3 text-base transition ${
+                    className={`block rounded-xl px-3 py-3 text-base transition duration-state ease-standard active:bg-line/60 ${
                       isActive(pathname, item.href)
                         ? "bg-coffee/5 font-semibold text-coffee underline decoration-caramel decoration-2 underline-offset-8"
                         : "text-muted hover:bg-line/50 hover:text-coffee"
