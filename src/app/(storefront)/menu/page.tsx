@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { asc } from "drizzle-orm";
 import { Coffee } from "lucide-react";
 import { aboutContent } from "@/lib/config";
 import Container from "@/components/ui/Container";
 import ProductCard from "@/components/product/ProductCard";
-import { getDb } from "@/lib/db";
-import {
-  categories,
-  products,
-  type Category,
-  type Product,
-} from "@/lib/db/schema";
+import type { Category, Product } from "@/lib/db/schema";
+import { getMenuCatalog } from "@/lib/products/catalog";
 
 // Title ngắn — root layout template tự thêm " — Happier Coffee" (HAP-19).
 export const metadata: Metadata = {
@@ -28,9 +22,11 @@ export const metadata: Metadata = {
 
 // Trang Menu (HAP-10) theo DESIGN.md mục 6: thanh lọc theo nhóm món trên
 // đầu (?nhom=<slug-nhom>, mặc định Tất cả), lưới ProductCard bên dưới.
-// Render phía server mỗi lần truy cập để luôn hiển thị dữ liệu thật mới
-// nhất từ DB; lỗi DB chỉ làm trang hiện trạng thái trống, không sập trang.
-export const dynamic = "force-dynamic";
+// Trang vẫn render theo request vì dùng searchParams, nhưng từ HAP-21
+// dữ liệu catalogue đọc qua cache (tag `catalog`, xem
+// src/lib/products/catalog.ts) — không query DB mỗi lần điều hướng, và
+// admin sửa sản phẩm thì cache bị invalidation ngay. Lỗi DB chỉ làm
+// trang hiện trạng thái trống, không sập trang.
 
 interface MenuData {
   categoryList: Category[];
@@ -39,17 +35,7 @@ interface MenuData {
 
 async function getMenuData(): Promise<MenuData | null> {
   try {
-    const db = getDb();
-    const [categoryList, productList] = await Promise.all([
-      db
-        .select()
-        .from(categories)
-        .orderBy(asc(categories.sortOrder), asc(categories.name)),
-      db
-        .select()
-        .from(products)
-        .orderBy(asc(products.sortOrder), asc(products.name)),
-    ]);
+    const { categoryList, productList } = await getMenuCatalog();
     const productsByCategoryId = new Map<string, Product[]>();
     for (const product of productList) {
       const group = productsByCategoryId.get(product.categoryId) ?? [];

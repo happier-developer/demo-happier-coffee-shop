@@ -1,14 +1,12 @@
 import type { MetadataRoute } from "next";
-import { asc } from "drizzle-orm";
 import { siteUrl } from "@/lib/config";
-import { getDb } from "@/lib/db";
-import { products } from "@/lib/db/schema";
+import { getProductSlugsForSitemap } from "@/lib/products/catalog";
 
 // sitemap.xml (HAP-19): các route tĩnh công khai + toàn bộ slug sản phẩm
-// từ DB. Bắt buộc force-dynamic để danh sách món luôn mới; lỗi DB (hoặc
-// build không có DATABASE_URL) KHÔNG được làm gãy sitemap/deploy — khi đó
-// chỉ còn route tĩnh và lỗi được log ra console.
-export const dynamic = "force-dynamic";
+// từ DB. Từ HAP-21 slug đọc qua cache catalogue (tag `catalog`) — admin
+// thêm/xoá sản phẩm thì invalidation ngay, không cần render động mỗi
+// request. Lỗi DB (hoặc build không có DATABASE_URL) KHÔNG được làm gãy
+// sitemap/deploy — khi đó chỉ còn route tĩnh và lỗi được log ra console.
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: siteUrl, changeFrequency: "weekly", priority: 1 },
@@ -19,11 +17,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    const db = getDb();
-    const rows = await db
-      .select({ slug: products.slug, updatedAt: products.updatedAt })
-      .from(products)
-      .orderBy(asc(products.slug));
+    const rows = await getProductSlugsForSitemap();
 
     return [
       ...staticRoutes,
