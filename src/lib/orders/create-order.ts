@@ -119,8 +119,8 @@ export async function createOrder(
         db.insert(orders).values({
           id: orderId,
           code,
-          // Khách vãng lai: userId = null. HAP-13 sẽ truyền userId của
-          // khách đã đăng nhập vào tham số của hàm này.
+          // userId do Server Action checkout truyền vào sau khi đọc
+          // phiên ở server (HAP-13); khách vãng lai: null.
           userId: userId ?? null,
           customerName: data.customerName,
           customerPhone: data.customerPhone,
