@@ -9,15 +9,14 @@ const nextConfig: NextConfig = {
   },
   images: {
     // Ảnh món/hero dùng placeholder từ Unsplash (DESIGN.md mục 7).
+    // Từ HAP-16 admin tự dán link ảnh món (validate ở server: chỉ nhận
+    // https hoặc đường dẫn nội bộ) nên cho phép mọi host https — nếu
+    // không, một link ảnh ngoài Unsplash/VietQR sẽ làm next/image ném
+    // lỗi và vỡ cả trang Menu/chi tiết.
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        // Ảnh VietQR động ở màn hình xác nhận đơn (HAP-12).
-        protocol: "https",
-        hostname: "img.vietqr.io",
+        hostname: "**",
       },
     ],
   },
