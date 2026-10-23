@@ -9,6 +9,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import {
   deleteProductAction,
   setProductAvailabilityAction,
@@ -123,6 +124,19 @@ export default function ProductRowActions({
           </button>
         )}
       </div>
+
+      {/* Chỉ báo đang xử lý (HAP-26): spinner + chữ khi action đang
+          chạy (các nút đã disabled + mờ), tránh cảm giác bấm mà
+          không có phản hồi. */}
+      {busy && !confirmingDelete ? (
+        <p
+          role="status"
+          className="flex items-center gap-1.5 text-xs text-muted"
+        >
+          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+          Đang xử lý…
+        </p>
+      ) : null}
 
       {message ? (
         <p
