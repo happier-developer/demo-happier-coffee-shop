@@ -84,26 +84,37 @@ export default function Header() {
   // email — hỏi /api/me, nơi server chốt isAdmin theo ADMIN_EMAILS và
   // chỉ trả về một boolean. Mặc định false và chỉ bật sau khi server
   // xác nhận, nên user thường/khách không bao giờ thấy nút nháy lên.
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Kết quả kiểm tra được gắn với đúng email đã hỏi: đổi tài khoản thì
+  // kết quả cũ tự vô hiệu khi suy ra isAdmin (không setState đồng bộ
+  // trong effect — theo quy ước lint của repo).
+  const [adminCheck, setAdminCheck] = useState<{
+    email: string;
+    isAdmin: boolean;
+  } | null>(null);
   const sessionEmail = sessionUser?.email ?? null;
   useEffect(() => {
-    if (!sessionEmail) {
-      setIsAdmin(false);
-      return;
-    }
+    if (!sessionEmail) return;
     let cancelled = false;
     fetch("/api/me", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : { isAdmin: false }))
       .then((data: { isAdmin?: boolean }) => {
-        if (!cancelled) setIsAdmin(data.isAdmin === true);
+        if (!cancelled) {
+          setAdminCheck({ email: sessionEmail, isAdmin: data.isAdmin === true });
+        }
       })
       .catch(() => {
-        if (!cancelled) setIsAdmin(false);
+        if (!cancelled) {
+          setAdminCheck({ email: sessionEmail, isAdmin: false });
+        }
       });
     return () => {
       cancelled = true;
     };
   }, [sessionEmail]);
+  const isAdmin =
+    sessionEmail !== null &&
+    adminCheck?.email === sessionEmail &&
+    adminCheck.isAdmin;
   const accountLabel = sessionUser
     ? shortUserLabel(sessionUser.name, sessionUser.email)
     : "Tài khoản";
