@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        // Ảnh VietQR động ở màn hình xác nhận đơn (HAP-12).
+        protocol: "https",
+        hostname: "img.vietqr.io",
+      },
     ],
   },
 };

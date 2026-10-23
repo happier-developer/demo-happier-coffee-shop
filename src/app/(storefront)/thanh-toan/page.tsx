@@ -1,0 +1,15 @@
+import type { Metadata } from "next";
+import CheckoutView from "@/components/checkout/CheckoutView";
+
+export const metadata: Metadata = {
+  title: "Thanh toán — Happier Coffee",
+  description:
+    "Đặt hàng và thanh toán tại Happier Coffee: chuyển khoản VietQR hoặc tiền mặt khi nhận hàng.",
+};
+
+// Trang Thanh toán (HAP-12): nội dung nằm ở CheckoutView (client component)
+// vì giỏ lưu ở localStorage phía client theo [Quyết định A2]; việc tạo đơn
+// chạy qua Server Action placeOrder ở src/server-actions/checkout.ts.
+export default function CheckoutPage() {
+  return <CheckoutView />;
+}
