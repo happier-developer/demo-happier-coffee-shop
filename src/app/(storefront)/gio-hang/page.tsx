@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
-import PlaceholderPage from "../PlaceholderPage";
+import CartView from "@/components/cart/CartView";
 
 export const metadata: Metadata = {
   title: "Giỏ hàng — Happier Coffee",
   description: "Giỏ hàng của bạn tại Happier Coffee.",
 };
 
-// Placeholder (HAP-8): trang Giỏ hàng thật (danh sách món, sửa số lượng,
-// tổng tiền, nút Thanh toán) thuộc HAP-11; checkout thuộc HAP-12.
+// Trang Giỏ hàng thật (HAP-11): nội dung nằm ở CartView (client component)
+// vì giỏ lưu ở localStorage phía client theo [Quyết định A2]; trang này chỉ
+// giữ metadata phía server. Đặt hàng/thanh toán thuộc HAP-12.
 export default function CartPage() {
-  return (
-    <PlaceholderPage
-      title="Giỏ hàng"
-      note="Giỏ hàng và thanh toán sẽ ra mắt ở bước tiếp theo."
-    />
-  );
+  return <CartView />;
 }
