@@ -75,9 +75,17 @@
 - Lối vào quản trị (HAP-25): nút "Quản trị" (icon LayoutDashboard, nền coffee chữ cream) ở Header storefront + khối "Khu vực quản trị" ở trang /account — chỉ render khi server xác nhận tài khoản là admin.
 - Hiệu ứng click "giọt cà phê loang" (HAP-24, chỉ storefront — không áp dụng admin): khi nhấn chuột/tap, một giọt cà phê loang ra tại đúng điểm nhấn như giọt rơi vào sữa, kèm 1 vòng gợn mờ, rồi fade hết. Token: `--duration-drop` 700ms, easing `--ease-standard`, kích thước tối đa 56px (thu nhỏ từ 96px theo yêu cầu của Duy khi nghiệm thu HAP-24); giọt dùng radial-gradient từ token `--color-coffee` sang `--color-caramel` với alpha tối đa ~0.35 (không đậm hơn — tránh trông như vết lem). Keyframes trong globals.css: `coffee-drop` (giọt loang, scale 0.12 → 1) và `coffee-ring` (vòng gợn, scale 0.2 → 1.15), cả hai chỉ animate transform/opacity. Lớp hiệu ứng là overlay `pointer-events: none`, tối đa 5 giọt đồng thời, node tự dọn sau animation; khi prefers-reduced-motion bật thì tắt hoàn toàn (không sinh giọt).
 
-## 10. Changelog thiết kế
+## 10. Blog (HAP-28)
+
+- **Danh sách /blog:** lưới thẻ bài (ảnh bìa 16:9, meta ngày · tác giả chữ nhỏ uppercase màu muted, tiêu đề bold màu coffee — hover chuyển caramel, excerpt tối đa 3 dòng, liên kết "Đọc tiếp →"). Thẻ là một liên kết duy nhất tới bài viết.
+- **Trang bài viết:** khổ đọc tối đa 720px căn giữa; tiêu đề 3xl–4xl; ảnh bìa bo góc 2xl tỉ lệ 16:9; nội dung dùng class `.post-content` trong globals.css — cỡ chữ 17px, line-height 1.8, H2 24px/H3 20px bold, trích dẫn có vạch trái caramel và chữ nghiêng muted, liên kết màu cta có gạch chân, ảnh trong bài bo góc 1rem. Chỉ dùng token màu hiện có, không thêm màu mới.
+- **Editor trong admin (Tiptap):** khung viền line, bo góc xl; toolbar nền cream mờ, nút công cụ 36px (icon 18px), trạng thái active có nền cream + viền line + chữ cta; vùng soạn thảo dùng chính `.post-content` để bản soạn sát bản hiển thị. Nút/nề form giữ nguyên quy ước mục 5–6 và micro-interactions mục 9.
+- **Nhãn trạng thái admin:** "Đã xuất bản" dùng cặp màu success, "Nháp" dùng cặp màu warning (nền nhạt + chấm tròn), cùng mẫu nhãn còn/hết hàng của sản phẩm.
+
+## 11. Changelog thiết kế
 - v1 (2026-10-23): bản đầu theo khung AI-DLC Factory T2 — Duy đã duyệt tại cổng G2 ngày 2026-10-23.
 - v1.1 (2026-10-24): thêm mục 9 Micro-interactions (HAP-23).
 - v1.2 (2026-10-24): bổ sung hiệu ứng click "giọt cà phê loang" vào mục 9 (HAP-24).
 - v1.3 (2026-10-24): lối vào quản trị cho admin (HAP-25) + quy ước loading skeleton/pending ở khu admin (HAP-26), mục 9.
 - v1.4 (2026-10-24): thu nhỏ hiệu ứng giọt cà phê loang từ 96px xuống 56px (HAP-24).
+- v1.5 (2026-10-24): mục 10 mới — quy ước Blog (thẻ bài, khổ đọc .post-content, editor Tiptap trong admin, nhãn Nháp/Đã xuất bản) cho HAP-28.

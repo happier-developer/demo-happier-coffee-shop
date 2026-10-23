@@ -134,3 +134,60 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Typography nội dung bài Blog (HAP-28 — DESIGN.md mục 10): áp cho HTML
+   do Tiptap sinh ra trong .post-content. Khổ đọc hẹp, cỡ chữ 17px,
+   khoảng cách đoạn thoáng; chỉ dùng token màu của @theme. */
+.post-content {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--color-coffee);
+  overflow-wrap: break-word;
+}
+.post-content > * + * {
+  margin-top: 1.25em;
+}
+.post-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 2em;
+}
+.post-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-top: 1.75em;
+}
+.post-content ul,
+.post-content ol {
+  padding-left: 1.5em;
+}
+.post-content ul {
+  list-style: disc;
+}
+.post-content ol {
+  list-style: decimal;
+}
+.post-content li + li {
+  margin-top: 0.4em;
+}
+.post-content blockquote {
+  border-left: 3px solid var(--color-caramel);
+  padding-left: 1em;
+  color: var(--color-muted);
+  font-style: italic;
+}
+.post-content a {
+  color: var(--color-cta);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.post-content img {
+  border-radius: 1rem;
+  max-width: 100%;
+  height: auto;
+}
+.post-content strong {
+  font-weight: 700;
+}

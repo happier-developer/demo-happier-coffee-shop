@@ -8,6 +8,13 @@
       "when": 1792694545901,
       "tag": "0000_closed_wrecking_crew",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792785383846,
+      "tag": "0001_blog_posts",
+      "breakpoints": true
     }
   ]
 }

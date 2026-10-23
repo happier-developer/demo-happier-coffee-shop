@@ -21,6 +21,13 @@ const timeVi = new Intl.DateTimeFormat("vi-VN", {
   hourCycle: "h23",
 });
 
+/** Chỉ ngày, dạng "23/10/2026" — dùng cho Blog (HAP-28). */
+export function formatDateVi(value: Date | string): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return dateVi.format(date);
+}
+
 /**
  * Ngày giờ hiển thị cho khách, dạng "23/10/2026, 10:30".
  * Ghép riêng ngày và giờ để thứ tự hiển thị nhất quán giữa các runtime
