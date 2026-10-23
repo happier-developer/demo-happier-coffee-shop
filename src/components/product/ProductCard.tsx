@@ -12,7 +12,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const detailHref = `/menu/${product.slug}`;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
+    <article className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-transform duration-state ease-standard active:scale-[0.99]">
       <Link
         href={detailHref}
         className="relative block aspect-[4/3] overflow-hidden bg-line/40"
