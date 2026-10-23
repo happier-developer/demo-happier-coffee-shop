@@ -50,7 +50,7 @@ async function getMenuData(): Promise<MenuData | null> {
 }
 
 function pillClasses(active: boolean): string {
-  return `inline-flex items-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta ${
+  return `inline-flex items-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition duration-state ease-standard active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta ${
     active
       ? "bg-coffee text-cream"
       : "border border-line bg-surface text-coffee hover:border-caramel hover:text-cta"
