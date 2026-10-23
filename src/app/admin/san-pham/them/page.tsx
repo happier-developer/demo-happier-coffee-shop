@@ -10,7 +10,7 @@ import type { Category } from "@/lib/db/schema";
 // Server Action createProductAction (validate + requireAdmin ở server).
 
 export const metadata: Metadata = {
-  title: "Thêm sản phẩm — Quản trị Happier Coffee",
+  title: "Thêm sản phẩm",
 };
 
 export default async function AdminAddProductPage() {

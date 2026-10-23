@@ -13,6 +13,7 @@ import {
   products,
   type Product,
 } from "@/lib/db/schema";
+import { aboutContent } from "@/lib/config";
 import { formatVnd } from "@/lib/format";
 
 // Trang chi tiết sản phẩm (HAP-10) theo DESIGN.md mục 6: ảnh lớn bên
@@ -59,6 +60,10 @@ async function getProductDetail(slug: string): Promise<ProductDetail | null> {
   };
 }
 
+// Metadata theo sản phẩm (HAP-10, mở rộng OG ở HAP-19): title = tên món
+// (root template tự thêm " — Happier Coffee"), description kèm giá, ảnh OG
+// = ảnh sản phẩm (thiếu ảnh thì dùng ảnh OG mặc định của site). Sản phẩm
+// không tồn tại/lỗi DB → metadata mặc định gọn, TUYỆT ĐỐI không ném lỗi.
 export async function generateMetadata({
   params,
 }: {
@@ -68,17 +73,29 @@ export async function generateMetadata({
   try {
     const detail = await getProductDetail(slug);
     if (detail) {
+      const baseDescription =
+        detail.product.description ??
+        `Đặt ${detail.product.name} tại Happier Coffee.`;
+      const description = `${baseDescription} — Giá ${formatVnd(detail.product.priceVnd)}`;
       return {
-        title: `${detail.product.name} — Happier Coffee`,
-        description:
-          detail.product.description ??
-          `Đặt ${detail.product.name} tại Happier Coffee.`,
+        title: detail.product.name,
+        description,
+        openGraph: {
+          title: `${detail.product.name} — Happier Coffee`,
+          description,
+          images: [
+            {
+              url: detail.product.imageUrl ?? aboutContent.heroImage,
+              alt: detail.product.name,
+            },
+          ],
+        },
       };
     }
   } catch (error) {
     console.error("Không tải được metadata sản phẩm:", error);
   }
-  return { title: "Chi tiết món — Happier Coffee" };
+  return { title: "Chi tiết món" };
 }
 
 export default async function ProductDetailPage({

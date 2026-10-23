@@ -24,9 +24,15 @@ import {
 // duy nhất trong shopConfig (Footer dùng chung); link Zalo và URL bản đồ
 // được suy ra từ chính các giá trị đó. NỘI DUNG MẪU, thay thật ở HAP-20.
 
+// Title ngắn — root layout template tự thêm " — Happier Coffee" (HAP-19).
 export const metadata: Metadata = {
-  title: `Liên hệ — ${shopConfig.name}`,
+  title: "Liên hệ",
   description: contactContent.lead,
+  openGraph: {
+    title: `Liên hệ — ${shopConfig.name}`,
+    description: contactContent.lead,
+    images: [{ url: shopConfig.heroImage, alt: shopConfig.name }],
+  },
 };
 
 // Kiểu nút theo DESIGN.md mục 5 cho các link rời khỏi site (tel:, Zalo) —

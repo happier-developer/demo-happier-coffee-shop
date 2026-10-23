@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import CartView from "@/components/cart/CartView";
 
+// Trang chức năng cá nhân — noindex (HAP-19).
 export const metadata: Metadata = {
-  title: "Giỏ hàng — Happier Coffee",
+  title: "Giỏ hàng",
   description: "Giỏ hàng của bạn tại Happier Coffee.",
+  robots: { index: false, follow: false },
 };
 
 // Trang Giỏ hàng thật (HAP-11): nội dung nằm ở CartView (client component)

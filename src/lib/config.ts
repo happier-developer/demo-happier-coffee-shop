@@ -111,6 +111,12 @@ export const contactContent = {
   },
 } as const;
 
+// URL production chính thức của website — NGUỒN DUY NHẤT cho metadataBase,
+// Open Graph, sitemap.xml và robots.txt (HAP-19). Khi quán có domain riêng
+// thì chỉ đổi đúng hằng số này (và thêm domain vào Neon Auth trusted
+// domains — xem README mục Deploy).
+export const siteUrl = "https://demo-happier-coffee-shop.vercel.app";
+
 // Link Zalo suy ra từ SĐT trong shopConfig (bỏ khoảng trắng) — thay SĐT ở
 // shopConfig là link tự cập nhật, không phải sửa thêm chỗ nào khác.
 export const zaloHref = `https://zalo.me/${shopConfig.phone.replace(/\s+/g, "")}`;

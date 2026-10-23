@@ -19,7 +19,7 @@ import { PAYMENT_METHOD_LABELS } from "@/lib/orders/status";
 // Trang thuộc khu /admin (layout đã khai force-dynamic).
 
 export const metadata: Metadata = {
-  title: "Chi tiết đơn — Quản trị Happier Coffee",
+  title: "Chi tiết đơn",
 };
 
 interface PageProps {

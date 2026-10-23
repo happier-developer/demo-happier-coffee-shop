@@ -13,7 +13,7 @@ import { formatVnd } from "@/lib/format";
 // storefront: danh sách gồm CẢ món hết hàng để admin quản lý.
 
 export const metadata: Metadata = {
-  title: "Sản phẩm — Quản trị Happier Coffee",
+  title: "Sản phẩm",
 };
 
 function AvailabilityBadge({ isAvailable }: { isAvailable: boolean }) {

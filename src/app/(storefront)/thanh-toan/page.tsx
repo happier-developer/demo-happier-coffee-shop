@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import CheckoutView from "@/components/checkout/CheckoutView";
 
+// Trang chức năng cá nhân — noindex (HAP-19).
 export const metadata: Metadata = {
-  title: "Thanh toán — Happier Coffee",
+  title: "Thanh toán",
   description:
     "Đặt hàng và thanh toán tại Happier Coffee: chuyển khoản VietQR hoặc tiền mặt khi nhận hàng.",
+  robots: { index: false, follow: false },
 };
 
 // Trang Thanh toán (HAP-12): nội dung nằm ở CheckoutView (client component)

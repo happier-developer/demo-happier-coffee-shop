@@ -16,9 +16,15 @@ import { aboutContent, shopConfig } from "@/lib/config";
 // khác biệt → CTA xem menu. Toàn bộ nội dung chữ + ảnh lấy từ
 // src/lib/config.ts (aboutContent) — NỘI DUNG MẪU, thay thật ở HAP-20.
 
+// Title ngắn — root layout template tự thêm " — Happier Coffee" (HAP-19).
 export const metadata: Metadata = {
-  title: `Giới thiệu — ${shopConfig.name}`,
+  title: "Giới thiệu",
   description: aboutContent.lead,
+  openGraph: {
+    title: `Giới thiệu — ${shopConfig.name}`,
+    description: aboutContent.lead,
+    images: [{ url: aboutContent.heroImage, alt: aboutContent.heroImageAlt }],
+  },
 };
 
 // Tra khóa icon trong config sang component Lucide.
