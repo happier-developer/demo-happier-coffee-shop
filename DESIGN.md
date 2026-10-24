@@ -92,3 +92,4 @@
 - v1.4 (2026-10-24): thu nhỏ hiệu ứng giọt cà phê loang từ 96px xuống 56px (HAP-24).
 - v1.5 (2026-10-24): mục 10 mới — quy ước Blog (thẻ bài, khổ đọc .post-content, editor Tiptap trong admin, nhãn Nháp/Đã xuất bản) cho HAP-28.
 - v1.6 (2026-10-24): quy ước stepper số lượng kiểu Shopee cho nút Thêm vào giỏ (HAP-29), bổ sung ở mục 9.
+- v1.7 (2026-10-24): ảnh LCP (hero trang chủ, ảnh bìa Blog, ảnh chi tiết món, ảnh Giới thiệu) phải có cả `priority` và `fetchPriority="high"` — chỉ `priority` thì Next không sinh fetchpriority cho thẻ preload, Lighthouse báo LCP request discovery FAIL (HAP-30).
