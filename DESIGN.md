@@ -76,6 +76,7 @@
 - Hiệu ứng click "giọt cà phê loang" (HAP-24, chỉ storefront — không áp dụng admin): khi nhấn chuột/tap, một giọt cà phê loang ra tại đúng điểm nhấn như giọt rơi vào sữa, kèm 1 vòng gợn mờ, rồi fade hết. Token: `--duration-drop` 700ms, easing `--ease-standard`, kích thước tối đa 56px (thu nhỏ từ 96px theo yêu cầu của Duy khi nghiệm thu HAP-24); giọt dùng radial-gradient từ token `--color-coffee` sang `--color-caramel` với alpha tối đa ~0.35 (không đậm hơn — tránh trông như vết lem). Keyframes trong globals.css: `coffee-drop` (giọt loang, scale 0.12 → 1) và `coffee-ring` (vòng gợn, scale 0.2 → 1.15), cả hai chỉ animate transform/opacity. Lớp hiệu ứng là overlay `pointer-events: none`, tối đa 5 giọt đồng thời, node tự dọn sau animation; khi prefers-reduced-motion bật thì tắt hoàn toàn (không sinh giọt).
 
 - Stepper số lượng kiểu Shopee (HAP-29): khi món đã có trong giỏ, nút "Thêm vào giỏ" trên thẻ sản phẩm tự chuyển thành stepper [−] số [+] đồng bộ với giỏ (nút 36px ở thẻ, 44px ở trang chi tiết; viền line, nền surface, hover viền caramel, press scale 0.95; số lượng bold tabular-nums ở giữa, `pop-soft` khi đổi số). Giảm về 0 → món rời giỏ, nút trở về "Thêm vào giỏ". Món hết hàng không hiện stepper (giữ trạng thái khóa). Chiều cao stepper bằng chiều cao nút thêm để thẻ không nhảy layout.
+- Nhập trực tiếp số lượng (HAP-31): số ở giữa stepper là ô input gõ được (kiểu Shopee) — chạm vào số là gõ ngay, chỉ nhận chữ số, mở bàn phím số trên mobile; Enter/blur chốt vào giỏ, rỗng/sai hoàn số cũ, gõ 0 xóa món, Escape hủy nhập. Ô input rộng 40px (đủ 2–3 chữ số), không animate khi đang gõ để tránh nhảy layout; trang giỏ dùng chung component với cap 99 (quá 99 kẹp về 99).
 
 ## 10. Blog (HAP-28)
 
@@ -94,3 +95,4 @@
 - v1.6 (2026-10-24): quy ước stepper số lượng kiểu Shopee cho nút Thêm vào giỏ (HAP-29), bổ sung ở mục 9.
 - v1.7 (2026-10-24): ảnh LCP (hero trang chủ, ảnh bìa Blog, ảnh chi tiết món, ảnh Giới thiệu) phải có cả `priority` và `fetchPriority="high"` — chỉ `priority` thì Next không sinh fetchpriority cho thẻ preload, Lighthouse báo LCP request discovery FAIL (HAP-30).
 - v1.8 (2026-10-24): SDK auth (Neon Auth) không được import tĩnh trong Header — tách thành SessionProvider + SessionLoader tải lười sau lần render đầu (HAP-30 vòng 2), giảm ~70 KiB gzip JS đầu trang; Header chỉ dùng context nhẹ. Trạng thái mặc định lúc chờ vẫn là nút "Tài khoản" như khi SSR.
+- v1.9 (2026-10-24): số lượng ở stepper thành ô input gõ trực tiếp kiểu Shopee (HAP-31), bổ sung ở mục 9; trang giỏ dùng chung QuantityStepper thay stepper inline riêng.
