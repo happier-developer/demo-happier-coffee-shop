@@ -58,6 +58,7 @@ export default function AboutPage() {
               alt={aboutContent.heroImageAlt}
               fill
               priority
+              fetchPriority="high"
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />

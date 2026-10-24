@@ -111,6 +111,11 @@ export default async function BlogPostPage({
               sizes="(max-width: 768px) 100vw, 720px"
               className="object-cover"
               priority
+              // HAP-30: priority một mình không đủ — Next chỉ sinh thẻ
+              // preload + fetchpriority="high" khi có prop này; thiếu nó,
+              // Lighthouse báo LCP request discovery FAIL (ảnh bìa tải
+              // ở mức ưu tiên thường trên mobile Slow 4G).
+              fetchPriority="high"
             />
           </div>
         ) : null}
