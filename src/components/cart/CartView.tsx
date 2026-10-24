@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Coffee, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Coffee, ShoppingCart, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
+import QuantityStepper from "@/components/product/QuantityStepper";
 import { useCart, type CartItem } from "@/lib/cart/cart-context";
 import { formatVnd } from "@/lib/format";
 
@@ -15,19 +16,18 @@ import { formatVnd } from "@/lib/format";
 // qua useSyncExternalStore — server luôn render trạng thái trống, client
 // đồng bộ sau hydration nên không lệch SSR/CSR và giữ nguyên khi chuyển trang.
 //
-// Hành vi số lượng (nhất quán với updateQuantity trong cart-context):
+// Hành vi số lượng (HAP-11, dùng chung QuantityStepper từ HAP-29/31):
 // - Nút +/- chỉnh trong khoảng 1..99 (khớp MAX_QUANTITY ở trang chi tiết).
 // - Bấm "-" khi số lượng đang là 1 sẽ XÓA món khỏi giỏ (updateQuantity với
 //   số lượng <= 0 = xóa), giống nút thùng rác ở cùng dòng.
+// - Gõ trực tiếp vào ô số (HAP-31): Enter/blur chốt, rỗng/sai hoàn số
+//   cũ, gõ 0 xóa món, quá 99 kẹp về 99.
 // Đặt hàng/thanh toán là HAP-12: nút "Tiến hành đặt hàng" chỉ trỏ /thanh-toan.
 
 const MAX_QUANTITY = 99;
 
-const stepperButtonClasses =
-  "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-coffee transition duration-state ease-standard active:scale-95 hover:border-caramel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta disabled:pointer-events-none disabled:opacity-50";
-
 function CartItemRow({ item }: { item: CartItem }) {
-  const { updateQuantity, removeItem } = useCart();
+  const { removeItem } = useCart();
   const lineTotalVnd = item.priceVnd * item.quantity;
 
   return (
@@ -73,39 +73,12 @@ function CartItemRow({ item }: { item: CartItem }) {
           Đơn giá {formatVnd(item.priceVnd)}
         </p>
         <div className="mt-auto flex items-end justify-between gap-3 pt-3">
-          <div
-            className="inline-flex items-center gap-1"
-            aria-label={`Số lượng ${item.name}`}
-          >
-            <button
-              type="button"
-              onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-              aria-label={
-                item.quantity <= 1
-                  ? `Xóa ${item.name} khỏi giỏ hàng`
-                  : `Giảm số lượng ${item.name}`
-              }
-              className={stepperButtonClasses}
-            >
-              <Minus className="h-4 w-4" aria-hidden />
-            </button>
-            <span
-              key={item.quantity}
-              className="inline-block w-8 animate-pop-soft text-center font-bold text-coffee tabular-nums"
-              aria-live="polite"
-            >
-              {item.quantity}
-            </span>
-            <button
-              type="button"
-              onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-              disabled={item.quantity >= MAX_QUANTITY}
-              aria-label={`Tăng số lượng ${item.name}`}
-              className={stepperButtonClasses}
-            >
-              <Plus className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
+          <QuantityStepper
+            productId={item.productId}
+            name={item.name}
+            size="card"
+            maxQuantity={MAX_QUANTITY}
+          />
           <span className="font-bold text-caramel tabular-nums">
             {formatVnd(lineTotalVnd)}
           </span>
