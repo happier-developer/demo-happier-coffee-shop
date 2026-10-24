@@ -7,7 +7,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Coffee,
   LayoutDashboard,
@@ -19,7 +19,8 @@ import {
 import Container from "@/components/ui/Container";
 import { mainNav, shopConfig } from "@/lib/config";
 import { useCart } from "@/lib/cart/cart-context";
-import { authClient } from "@/lib/auth/client";
+import SessionProvider from "./SessionProvider";
+import { useSessionInfo } from "./SessionContext";
 
 /** Nhãn rút gọn cho nút tài khoản khi đã đăng nhập: ưu tiên tên gọi
  *  (từ cuối của họ tên), không có tên thì dùng phần trước @ của email. */
@@ -67,56 +68,19 @@ function NavLink({
   );
 }
 
-export default function Header() {
+function HeaderInner() {
   const pathname = usePathname();
   const { totalQuantity, hydrated } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Phiên đăng nhập (HAP-13): đọc bằng client SDK của Neon Auth
-  // (useSession — dữ liệu phiên qua /api/auth/get-session). Chỉ để HIỂN
-  // THỊ: chưa đăng nhập (hoặc đang tải phiên) → nút "Tài khoản" trỏ trang
-  // đăng nhập như trước; đã đăng nhập → hiện tên/email rút gọn, trỏ
-  // /account. Mọi kiểm tra quyền thật vẫn ở server.
-  const { data: sessionData } = authClient.useSession();
-  const sessionUser = sessionData?.user ?? null;
-
-  // Nút "Quản trị" cho admin (HAP-25): client KHÔNG tự suy quyền từ
-  // email — hỏi /api/me, nơi server chốt isAdmin theo ADMIN_EMAILS và
-  // chỉ trả về một boolean. Mặc định false và chỉ bật sau khi server
-  // xác nhận, nên user thường/khách không bao giờ thấy nút nháy lên.
-  // Kết quả kiểm tra được gắn với đúng email đã hỏi: đổi tài khoản thì
-  // kết quả cũ tự vô hiệu khi suy ra isAdmin (không setState đồng bộ
-  // trong effect — theo quy ước lint của repo).
-  const [adminCheck, setAdminCheck] = useState<{
-    email: string;
-    isAdmin: boolean;
-  } | null>(null);
-  const sessionEmail = sessionUser?.email ?? null;
-  useEffect(() => {
-    if (!sessionEmail) return;
-    let cancelled = false;
-    fetch("/api/me", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : { isAdmin: false }))
-      .then((data: { isAdmin?: boolean }) => {
-        if (!cancelled) {
-          setAdminCheck({ email: sessionEmail, isAdmin: data.isAdmin === true });
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setAdminCheck({ email: sessionEmail, isAdmin: false });
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionEmail]);
-  const isAdmin =
-    sessionEmail !== null &&
-    adminCheck?.email === sessionEmail &&
-    adminCheck.isAdmin;
+  // Phiên đăng nhập + quyền admin lấy từ SessionProvider (HAP-30 vòng 2:
+  // SDK auth tải lười sau lần render đầu, không còn trong JS đầu trang).
+  // Chỉ để HIỂN THỊ: chưa đăng nhập (hoặc phiên chưa tải xong) → nút
+  // "Tài khoản" trỏ trang đăng nhập như trước; đã đăng nhập → hiện
+  // tên/email rút gọn, trỏ /account. Mọi kiểm tra quyền thật vẫn ở server.
+  const { user: sessionUser, isAdmin } = useSessionInfo();
   const accountLabel = sessionUser
-    ? shortUserLabel(sessionUser.name, sessionUser.email)
+    ? shortUserLabel(sessionUser.name ?? undefined, sessionUser.email)
     : "Tài khoản";
   const accountHref = sessionUser ? "/account" : "/auth/dang-nhap";
 
@@ -274,5 +238,16 @@ export default function Header() {
         </nav>
       )}
     </header>
+  );
+}
+
+// Wrapper ngoài: provider phải bao quanh HeaderInner thì hook
+// useSessionInfo() bên trong mới đọc được phiên thật (hook gọi ở
+// component cha của provider sẽ chỉ thấy giá trị mặc định).
+export default function Header() {
+  return (
+    <SessionProvider>
+      <HeaderInner />
+    </SessionProvider>
   );
 }
